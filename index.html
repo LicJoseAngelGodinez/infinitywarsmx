@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clash Royale - Clan Members</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      gap: 1.5rem;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      color: #f0c040;
+      letter-spacing: 1px;
+    }
+
+    .card {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 12px;
+      padding: 2rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      color: #f0c040;
+      letter-spacing: 0.5px;
+      align-self: flex-start;
+    }
+
+    label {
+      width: 100%;
+      font-size: 0.8rem;
+      color: #aaa;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid #0f3460;
+      background: #0d1b2a;
+      color: #eee;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #f0c040;
+    }
+
+    input[type="file"] {
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid #0f3460;
+      background: #0d1b2a;
+      color: #aaa;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+      background: #0f3460;
+      color: #f0c040;
+      border: none;
+      border-radius: 4px;
+      padding: 0.3rem 0.7rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-right: 0.6rem;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.75rem;
+      width: 100%;
+    }
+
+    button {
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      flex: 1;
+    }
+
+    button.primary {
+      background: #f0c040;
+      color: #1a1a2e;
+    }
+
+    button.secondary {
+      background: #1b4d3e;
+      color: #6bffb8;
+      border: 1px solid #6bffb8;
+    }
+
+    button:hover:not(:disabled) {
+      opacity: 0.88;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #status {
+      font-size: 0.85rem;
+      color: #aaa;
+      min-height: 1.2rem;
+      text-align: center;
+    }
+
+    #status.error   { color: #ff6b6b; }
+    #status.success { color: #6bffb8; }
+
+    /* leyenda */
+    .legend {
+      display: flex;
+      gap: 1.25rem;
+      font-size: 0.78rem;
+      color: #aaa;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+
+    .dot-inactive      { background: rgba(255, 90, 90, 0.55); }
+    .dot-low-donations { background: rgba(255, 210, 0, 0.45); }
+
+    /* Tabla principal */
+    #tableWrapper {
+      display: none;
+      width: 100%;
+      max-width: 1100px;
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid #0f3460;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    thead tr {
+      background: #0f3460;
+    }
+
+    thead th {
+      padding: 0.65rem 1rem;
+      text-align: left;
+      color: #f0c040;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #0f3460;
+      transition: filter 0.15s;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      filter: brightness(1.2);
+    }
+
+    tbody td {
+      padding: 0.55rem 1rem;
+      white-space: nowrap;
+    }
+
+    tbody tr.row-inactive      { background: rgba(255, 90, 90, 0.13); }
+    tbody tr.row-low-donations { background: rgba(255, 210, 0, 0.10); }
+
+    /* ── Diff Checker ──────────────────────────────────────────────────── */
+    .divider {
+      width: 100%;
+      max-width: 1100px;
+      border: none;
+      border-top: 1px solid #0f3460;
+    }
+
+    #diffStatus { font-size: 0.85rem; color: #aaa; min-height: 1.2rem; text-align: center; }
+    #diffStatus.error   { color: #ff6b6b; }
+    #diffStatus.success { color: #6bffb8; }
+
+    #diffResults {
+      display: none;
+      width: 100%;
+      max-width: 1100px;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    #diffResults.visible {
+      display: flex;
+    }
+
+    .diff-block {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #0f3460;
+      overflow-x: auto;
+    }
+
+    .diff-block-header {
+      padding: 0.6rem 1rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .diff-block-header.new-header    { background: rgba(107, 255, 184, 0.18); color: #6bffb8; }
+    .diff-block-header.left-header   { background: rgba(255, 90,  90,  0.18); color: #ff8080; }
+    .diff-block-header.stayed-header { background: rgba(240, 192, 64,  0.12); color: #f0c040; }
+
+    .diff-block table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .diff-block thead tr { background: #0f3460; }
+    .diff-block thead th { padding: 0.5rem 0.75rem; text-align: left; color: #f0c040; font-weight: 600; white-space: nowrap; }
+    .diff-block tbody tr { border-bottom: 1px solid #0f3460; transition: filter 0.15s; }
+    .diff-block tbody tr:last-child { border-bottom: none; }
+    .diff-block tbody tr:hover { filter: brightness(1.2); }
+    .diff-block tbody td { padding: 0.45rem 0.75rem; white-space: nowrap; }
+
+    .diff-block tbody tr.row-new  { background: rgba(107, 255, 184, 0.08); }
+    .diff-block tbody tr.row-left { background: rgba(255, 90,  90,  0.10); }
+
+    .note-input {
+      background: #0d1b2a;
+      border: 1px solid #0f3460;
+      border-radius: 4px;
+      color: #eee;
+      font-size: 0.8rem;
+      padding: 0.25rem 0.5rem;
+      width: 200px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .note-input:focus { border-color: #f0c040; }
+
+    .empty-row td {
+      padding: 0.75rem 1rem;
+      color: #555;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>⚔ Clash Royale — Clan Members</h1>
+
+  <!-- ── Consulta API ────────────────────────────────────────────────── -->
+  <div class="card">
+    <label>
+      API Key
+      <input
+        type="text"
+        id="apiKey"
+        placeholder="Pega tu API Key aquí"
+        autocomplete="off"
+        spellcheck="false"
+      />
+    </label>
+
+    <div class="btn-row">
+      <button class="primary" id="fetchBtn" onclick="fetchMembers()">Consultar</button>
+      <button class="secondary" id="downloadBtn" onclick="descargar()" disabled>Descargar CSV</button>
+    </div>
+
+    <span id="status"></span>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot dot-inactive"></div>
+      Inactivo más de 2 meses
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot dot-low-donations"></div>
+      Menos de 200 donaciones
+    </div>
+  </div>
+
+  <div id="tableWrapper">
+    <table>
+      <thead id="tableHead"></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── Comparar semanas ────────────────────────────────────────────── -->
+  <div class="card">
+    <h2>Comparar semanas</h2>
+    <label>
+      CSV del mes (con todas las semanas)
+      <input type="file" id="csvFile" accept=".csv" />
+    </label>
+    <div class="btn-row">
+      <button class="primary" onclick="comparar()">Comparar</button>
+    </div>
+    <span id="diffStatus"></span>
+  </div>
+
+  <div id="diffResults">
+    <!-- Nuevos -->
+    <div class="diff-block">
+      <div class="diff-block-header new-header" id="headerNew">Nuevos — 0</div>
+      <table>
+        <thead><tr>
+          <th>Tag</th><th>Nombre</th><th>Rol</th><th>Trofeos</th>
+          <th>Donaciones</th><th>Don. Recibidas</th><th>Nota (veterano)</th>
+        </tr></thead>
+        <tbody id="bodyNew"></tbody>
+      </table>
+    </div>
+
+    <!-- Se fueron -->
+    <div class="diff-block">
+      <div class="diff-block-header left-header" id="headerLeft">Se fueron — 0</div>
+      <table>
+        <thead><tr>
+          <th>Tag</th><th>Nombre</th><th>Rol</th><th>Trofeos</th>
+          <th>Donaciones</th><th>Don. Recibidas</th>
+        </tr></thead>
+        <tbody id="bodyLeft"></tbody>
+      </table>
+    </div>
+
+    <!-- Permanecen -->
+    <div class="diff-block">
+      <div class="diff-block-header stayed-header" id="headerStayed">Permanecen — 0</div>
+      <table>
+        <thead><tr>
+          <th>Tag</th><th>Nombre</th><th>Rol</th><th>Trofeos</th>
+          <th>Donaciones</th><th>Don. Recibidas</th><th>Nota (veterano)</th>
+        </tr></thead>
+        <tbody id="bodyStayed"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ── Constantes generales ────────────────────────────────────────────
+    const API_URL = "https://proxy.royaleapi.dev/v1/clans/%23228PYJ08/members";
+
+    // Fecha desde la que se lleva registro del clan. Útil a futuro para
+    // calcular tiempo en el clan por miembro.
+    const TRACKING_SINCE = new Date('2026-03-01');
+
+    const ROLE_ICON  = { leader: '👑', coLeader: '🛡️', elder: '👤', member: '' };
+    const ROLE_LABEL = { leader: 'Líder', coLeader: 'Colíder', elder: 'Veterano', member: 'Miembro' };
+
+    // Mapa inverso para el diff (los CSV ya traen el label en español)
+    const ROLE_ICON_BY_LABEL = { 'Líder': '👑', 'Colíder': '🛡️', 'Veterano': '👤', 'Miembro': '' };
+
+    // Clave en localStorage para las notas de candidatos a veterano
+    const NOTES_KEY = 'clan-vet-notes';
+
+    let currentMembers = [];
+    let currentData    = [];
+
+    // ── Mock para desarrollo ────────────────────────────────────────────
+    const MOCK = {"items":[{"tag":"#20CU2YCV","name":"NIWRE11","role":"coLeader","lastSeen":"20260308T194502.000Z","expLevel":79,"trophies":12532,"arena":{"id":54000142,"name":"Ultimate Clash Pit","rawName":"Arena_L16"},"clanRank":1,"previousClanRank":1,"donations":622,"donationsReceived":560,"clanChestPoints":0},{"tag":"#2V28YQVPL","name":"brayanloversfit","role":"elder","lastSeen":"20260308T162351.000Z","expLevel":67,"trophies":12168,"arena":{"id":54000141,"name":"Magic Academy","rawName":"Arena_L15"},"clanRank":2,"previousClanRank":2,"donations":328,"donationsReceived":320,"clanChestPoints":0},{"tag":"#JL28L8VG","name":"jhoss","role":"coLeader","lastSeen":"20260308T141554.000Z","expLevel":74,"trophies":12129,"arena":{"id":54000141,"name":"Magic Academy","rawName":"Arena_L15"},"clanRank":3,"previousClanRank":4,"donations":405,"donationsReceived":480,"clanChestPoints":0},{"tag":"#8JPGU9UP","name":"ⒺⓋⒾⓁⒺⓎ","role":"member","lastSeen":"20260308T192812.000Z","expLevel":61,"trophies":12092,"arena":{"id":54000141,"name":"Magic Academy","rawName":"Arena_L15"},"clanRank":4,"previousClanRank":3,"donations":10,"donationsReceived":40,"clanChestPoints":0},{"tag":"#29VPC02QG","name":"I∆nDr∆kouH™","role":"elder","lastSeen":"20260308T194323.000Z","expLevel":60,"trophies":12010,"arena":{"id":54000141,"name":"Magic Academy","rawName":"Arena_L15"},"clanRank":5,"previousClanRank":6,"donations":83,"donationsReceived":520,"clanChestPoints":0},{"tag":"#2CVGPUPG9","name":"D'Fate","role":"coLeader","lastSeen":"20260308T173831.000Z","expLevel":65,"trophies":11765,"arena":{"id":54000132,"name":"Summit of Heroes","rawName":"Arena_L14"},"clanRank":6,"previousClanRank":5,"donations":254,"donationsReceived":280,"clanChestPoints":0},{"tag":"#2LCRUCUU8","name":"Iza","role":"coLeader","lastSeen":"20260308T191517.000Z","expLevel":70,"trophies":11678,"arena":{"id":54000132,"name":"Summit of Heroes","rawName":"Arena_L14"},"clanRank":7,"previousClanRank":7,"donations":1117,"donationsReceived":600,"clanChestPoints":0},{"tag":"#22RVUCP9V","name":"JAACJG14 ;-;","role":"elder","lastSeen":"20260308T164034.000Z","expLevel":61,"trophies":11569,"arena":{"id":54000132,"name":"Summit of Heroes","rawName":"Arena_L14"},"clanRank":8,"previousClanRank":8,"donations":473,"donationsReceived":440,"clanChestPoints":0},{"tag":"#CU0QCP8J","name":"*#prz#*","role":"elder","lastSeen":"20260308T194910.000Z","expLevel":58,"trophies":11561,"arena":{"id":54000132,"name":"Summit of Heroes","rawName":"Arena_L14"},"clanRank":9,"previousClanRank":9,"donations":377,"donationsReceived":440,"clanChestPoints":0},{"tag":"#89QC9LURQ","name":"Tonyy","role":"elder","lastSeen":"20260308T042404.000Z","expLevel":63,"trophies":11534,"arena":{"id":54000132,"name":"Summit of Heroes","rawName":"Arena_L14"},"clanRank":10,"previousClanRank":10,"donations":509,"donationsReceived":0,"clanChestPoints":0},{"tag":"#9YRPV8YP","name":"⚡️jean⚡️","role":"member","lastSeen":"20260308T190603.000Z","expLevel":58,"trophies":11413,"arena":{"id":54000131,"name":"Musketeer Street","rawName":"Arena_L13"},"clanRank":11,"previousClanRank":11,"donations":214,"donationsReceived":0,"clanChestPoints":0},{"tag":"#82RJCU2JY","name":"RagnarLodbrock","role":"leader","lastSeen":"20260308T193532.000Z","expLevel":71,"trophies":11386,"arena":{"id":54000131,"name":"Musketeer Street","rawName":"Arena_L13"},"clanRank":12,"previousClanRank":12,"donations":785,"donationsReceived":640,"clanChestPoints":0},{"tag":"#9Y8CYR9QP","name":"DiegoPi","role":"elder","lastSeen":"20260308T201938.000Z","expLevel":71,"trophies":11263,"arena":{"id":54000131,"name":"Musketeer Street","rawName":"Arena_L13"},"clanRank":13,"previousClanRank":13,"donations":351,"donationsReceived":80,"clanChestPoints":0},{"tag":"#RUJGCLGLU","name":"ARIZMENDI :V","role":"elder","lastSeen":"20260308T172038.000Z","expLevel":72,"trophies":11189,"arena":{"id":54000131,"name":"Musketeer Street","rawName":"Arena_L13"},"clanRank":14,"previousClanRank":14,"donations":542,"donationsReceived":480,"clanChestPoints":0},{"tag":"#89J8Q9URV","name":"Danmostwanted","role":"member","lastSeen":"20260308T185710.000Z","expLevel":57,"trophies":11106,"arena":{"id":54000131,"name":"Musketeer Street","rawName":"Arena_L13"},"clanRank":15,"previousClanRank":15,"donations":143,"donationsReceived":440,"clanChestPoints":0},{"tag":"#98L920LPR","name":"Sasha","role":"member","lastSeen":"20260308T175616.000Z","expLevel":68,"trophies":10898,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":16,"previousClanRank":16,"donations":146,"donationsReceived":160,"clanChestPoints":0},{"tag":"#JUVCYG2LP","name":"Brandon","role":"member","lastSeen":"20260307T173758.000Z","expLevel":51,"trophies":10826,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":17,"previousClanRank":17,"donations":24,"donationsReceived":160,"clanChestPoints":0},{"tag":"#89P02YPQ","name":"LASHDUS","role":"elder","lastSeen":"20260308T171001.000Z","expLevel":58,"trophies":10816,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":18,"previousClanRank":18,"donations":500,"donationsReceived":416,"clanChestPoints":0},{"tag":"#QP88V2JQ","name":"EDWIN #43","role":"elder","lastSeen":"20260308T181741.000Z","expLevel":56,"trophies":10804,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":19,"previousClanRank":19,"donations":184,"donationsReceived":170,"clanChestPoints":0},{"tag":"#2CRPYV2V","name":"Batman","role":"member","lastSeen":"20260308T145253.000Z","expLevel":62,"trophies":10773,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":20,"previousClanRank":20,"donations":112,"donationsReceived":360,"clanChestPoints":0},{"tag":"#209Y9L0RP","name":"Lalito_26","role":"member","lastSeen":"20260308T121800.000Z","expLevel":54,"trophies":10630,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":21,"previousClanRank":21,"donations":236,"donationsReceived":120,"clanChestPoints":0},{"tag":"#LR0LGRU80","name":"ye","role":"member","lastSeen":"20260308T200120.000Z","expLevel":66,"trophies":10609,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":22,"previousClanRank":0,"donations":0,"donationsReceived":0,"clanChestPoints":0},{"tag":"#JQL98G99U","name":"EDUARDO","role":"elder","lastSeen":"20260308T022557.000Z","expLevel":52,"trophies":10594,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":23,"previousClanRank":22,"donations":195,"donationsReceived":240,"clanChestPoints":0},{"tag":"#JLP8LQLQC","name":"Haddyx","role":"member","lastSeen":"20260306T223421.000Z","expLevel":59,"trophies":10548,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":24,"previousClanRank":23,"donations":68,"donationsReceived":120,"clanChestPoints":0},{"tag":"#28CLUVCR8","name":"freddo","role":"member","lastSeen":"20260307T032642.000Z","expLevel":57,"trophies":10530,"arena":{"id":54000130,"name":"Royal Road","rawName":"Arena_L12"},"clanRank":25,"previousClanRank":24,"donations":294,"donationsReceived":200,"clanChestPoints":0},{"tag":"#28JQ0092U","name":"Edher16","role":"member","lastSeen":"20260307T054305.000Z","expLevel":55,"trophies":10314,"arena":{"id":54000117,"name":"Lumberlove Cabin","rawName":"Arena_L11"},"clanRank":26,"previousClanRank":25,"donations":34,"donationsReceived":80,"clanChestPoints":0},{"tag":"#8VLV2ULLU","name":"Nova I Jaicob™","role":"member","lastSeen":"20260308T032920.000Z","expLevel":55,"trophies":10186,"arena":{"id":54000117,"name":"Lumberlove Cabin","rawName":"Arena_L11"},"clanRank":27,"previousClanRank":27,"donations":27,"donationsReceived":40,"clanChestPoints":0},{"tag":"#LCUCCYCY8","name":"Mocosk8","role":"member","lastSeen":"20260308T181542.000Z","expLevel":41,"trophies":10176,"arena":{"id":54000117,"name":"Lumberlove Cabin","rawName":"Arena_L11"},"clanRank":28,"previousClanRank":26,"donations":111,"donationsReceived":200,"clanChestPoints":0},{"tag":"#LY0P2J22U","name":"Jesúx 88","role":"member","lastSeen":"20260307T191639.000Z","expLevel":55,"trophies":10161,"arena":{"id":54000117,"name":"Lumberlove Cabin","rawName":"Arena_L11"},"clanRank":29,"previousClanRank":28,"donations":338,"donationsReceived":480,"clanChestPoints":0},{"tag":"#LPP82P99L","name":"Marvincillo93","role":"coLeader","lastSeen":"20260308T201030.000Z","expLevel":64,"trophies":10104,"arena":{"id":54000117,"name":"Lumberlove Cabin","rawName":"Arena_L11"},"clanRank":30,"previousClanRank":29,"donations":1018,"donationsReceived":640,"clanChestPoints":0},{"tag":"#LP92U09GJ","name":"memo","role":"member","lastSeen":"20260308T183925.000Z","expLevel":56,"trophies":10066,"arena":{"id":54000117,"name":"Lumberlove Cabin","rawName":"Arena_L11"},"clanRank":31,"previousClanRank":30,"donations":387,"donationsReceived":440,"clanChestPoints":0},{"tag":"#GRVCQPPYJ","name":"julian07","role":"member","lastSeen":"20260308T195908.000Z","expLevel":40,"trophies":10000,"arena":{"id":54000117,"name":"Lumberlove Cabin","rawName":"Arena_L11"},"clanRank":32,"previousClanRank":31,"donations":166,"donationsReceived":40,"clanChestPoints":0},{"tag":"#YQUV2GQ8U","name":"sr mikels","role":"member","lastSeen":"20260308T151305.000Z","expLevel":40,"trophies":9530,"arena":{"id":54000031,"name":"Legendary Arena","rawName":"Arena_L10"},"clanRank":33,"previousClanRank":32,"donations":348,"donationsReceived":400,"clanChestPoints":0},{"tag":"#V08RUVPRU","name":"veterano del CR","role":"member","lastSeen":"20260308T170730.000Z","expLevel":44,"trophies":9302,"arena":{"id":54000020,"name":"Valkalla","rawName":"Arena_L9"},"clanRank":34,"previousClanRank":33,"donations":274,"donationsReceived":400,"clanChestPoints":0},{"tag":"#VC2UUUQ89","name":"edi","role":"coLeader","lastSeen":"20260308T190310.000Z","expLevel":44,"trophies":9063,"arena":{"id":54000020,"name":"Valkalla","rawName":"Arena_L9"},"clanRank":35,"previousClanRank":34,"donations":106,"donationsReceived":600,"clanChestPoints":0},{"tag":"#9R8RV0YJ0","name":"Leviathan","role":"member","lastSeen":"20260308T191633.000Z","expLevel":43,"trophies":9060,"arena":{"id":54000020,"name":"Valkalla","rawName":"Arena_L9"},"clanRank":36,"previousClanRank":36,"donations":94,"donationsReceived":400,"clanChestPoints":0},{"tag":"#JJU8G2G0U","name":"♧◇godher◇♧","role":"member","lastSeen":"20260308T024838.000Z","expLevel":47,"trophies":8893,"arena":{"id":54000019,"name":"PANCAKES!","rawName":"Arena_L8"},"clanRank":37,"previousClanRank":37,"donations":17,"donationsReceived":0,"clanChestPoints":0},{"tag":"#JQ8902GCQ","name":"fewwchis","role":"member","lastSeen":"20260308T032548.000Z","expLevel":42,"trophies":8816,"arena":{"id":54000019,"name":"PANCAKES!","rawName":"Arena_L8"},"clanRank":38,"previousClanRank":38,"donations":48,"donationsReceived":40,"clanChestPoints":0},{"tag":"#LVCP20LJ","name":"•Øbīţø-Šāmā•","role":"coLeader","lastSeen":"20241014T010036.000Z","expLevel":58,"trophies":8589,"arena":{"id":54000019,"name":"PANCAKES!","rawName":"Arena_L8"},"clanRank":39,"previousClanRank":39,"donations":0,"donationsReceived":0,"clanChestPoints":0},{"tag":"#Y929LLCCJ","name":"tif","role":"elder","lastSeen":"20260308T010253.000Z","expLevel":42,"trophies":8516,"arena":{"id":54000019,"name":"PANCAKES!","rawName":"Arena_L8"},"clanRank":40,"previousClanRank":40,"donations":223,"donationsReceived":0,"clanChestPoints":0},{"tag":"#VCRCVYYJ9","name":"Azkmalbert✓6-7","role":"elder","lastSeen":"20260308T191050.000Z","expLevel":41,"trophies":8095,"arena":{"id":54000018,"name":"Clash Fest","rawName":"Arena_L7"},"clanRank":41,"previousClanRank":43,"donations":122,"donationsReceived":80,"clanChestPoints":0},{"tag":"#V0C028PVU","name":"Alexandr_","role":"member","lastSeen":"20260308T162846.000Z","expLevel":40,"trophies":8092,"arena":{"id":54000018,"name":"Clash Fest","rawName":"Arena_L7"},"clanRank":42,"previousClanRank":42,"donations":206,"donationsReceived":240,"clanChestPoints":0},{"tag":"#20RQUY292L","name":"victor","role":"elder","lastSeen":"20260308T193811.000Z","expLevel":40,"trophies":7928,"arena":{"id":54000017,"name":"Boot Camp","rawName":"Arena_L6"},"clanRank":43,"previousClanRank":44,"donations":776,"donationsReceived":560,"clanChestPoints":0},{"tag":"#UU8J90YVC","name":"crono","role":"elder","lastSeen":"20260308T182112.000Z","expLevel":39,"trophies":7690,"arena":{"id":54000017,"name":"Boot Camp","rawName":"Arena_L6"},"clanRank":44,"previousClanRank":46,"donations":417,"donationsReceived":80,"clanChestPoints":0},{"tag":"#C298R2Q0","name":"Muppet","role":"member","lastSeen":"20251109T133313.000Z","expLevel":47,"trophies":7644,"arena":{"id":54000017,"name":"Boot Camp","rawName":"Arena_L6"},"clanRank":45,"previousClanRank":47,"donations":0,"donationsReceived":0,"clanChestPoints":0},{"tag":"#LYVYPQPUL","name":"KAKAROTO","role":"member","lastSeen":"20260308T153247.000Z","expLevel":46,"trophies":7556,"arena":{"id":54000017,"name":"Boot Camp","rawName":"Arena_L6"},"clanRank":46,"previousClanRank":48,"donations":282,"donationsReceived":680,"clanChestPoints":0},{"tag":"#89VGJQQYU","name":"❤Leon@rdo❤","role":"member","lastSeen":"20260308T125830.000Z","expLevel":55,"trophies":7349,"arena":{"id":54000016,"name":"Dragon Spa","rawName":"Arena_L5"},"clanRank":47,"previousClanRank":49,"donations":180,"donationsReceived":440,"clanChestPoints":0}],"paging":{"cursors":{}}};
+
+    // ── API ─────────────────────────────────────────────────────────────
+    async function fetchMembers() {
+      const apiKey = document.getElementById("apiKey").value.replace(/\s+/g, '');
+      const btn    = document.getElementById("fetchBtn");
+
+      if (!apiKey) {
+        setStatus("Ingresa tu API Key primero.", "error");
+        return;
+      }
+
+      btn.disabled = true;
+      document.getElementById("downloadBtn").disabled = true;
+      setStatus("Consultando API...");
+      hideTable();
+
+      try {
+        const res = await fetch(API_URL, {
+          headers: { Authorization: `Bearer ${apiKey}` }
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.message || `HTTP ${res.status}`);
+        }
+
+        const json    = await res.json();
+        const members = json.items ?? [];
+
+        if (!members.length) {
+          setStatus("No se encontraron miembros.", "error");
+          return;
+        }
+
+        loadMembers(members);
+        setStatus(`✓ ${members.length} miembros cargados.`, "success");
+
+      } catch (err) {
+        setStatus(`Error: ${err.message}`, "error");
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function loadMembers(members) {
+      currentMembers = members;
+      currentData    = transformToExcelFormat(members);
+      renderTable(members);
+      document.getElementById("downloadBtn").disabled = false;
+    }
+
+    // ── Transformación / CSV ────────────────────────────────────────────
+    function parseClashDate(str) {
+      return new Date(
+        str.replace(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})/, '$1-$2-$3T$4:$5:$6')
+      );
+    }
+
+    function transformToExcelFormat(members) {
+      return members.map(member => ({
+        'Tag':                   member.tag,
+        'Nombre':                member.name,
+        'Rol':                   ROLE_LABEL[member.role] || member.role,
+        'Última Vez Visto':      parseClashDate(member.lastSeen).toLocaleDateString('es-MX'),
+        'Nivel':                 member.expLevel,
+        'Trofeos':               member.trophies,
+        'Arena':                 member.arena.name,
+        'Posición Clan':         member.clanRank,
+        'Donaciones':            member.donations,
+        'Donaciones Recibidas':  member.donationsReceived,
+      }));
+    }
+
+    function exportToCSV(data) {
+      const headers = Object.keys(data[0]).join(',');
+      const rows    = data.map(row => Object.values(row).join(','));
+      return [headers, ...rows].join('\n');
+    }
+
+    function descargar() {
+      if (!currentData.length) return;
+      const csv   = exportToCSV(currentData);
+      const blob  = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url   = URL.createObjectURL(blob);
+      const a     = document.createElement('a');
+      const fecha = new Date().toISOString().slice(0, 10);
+      a.href      = url;
+      a.download  = `clan-members-${fecha}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ── Tabla principal ─────────────────────────────────────────────────
+    function renderTable(members) {
+      const twoMonthsAgo = new Date();
+      twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+
+      const headers = ['Tag','Nombre','Rol','Última Vez Visto','Nivel','Trofeos','Arena','Pos. Clan','Donaciones','Don. Recibidas'];
+
+      document.getElementById("tableHead").innerHTML =
+        '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+
+      document.getElementById("tableBody").innerHTML = members.map(m => {
+        const lastSeenDate = parseClashDate(m.lastSeen);
+        const inactive     = lastSeenDate < twoMonthsAgo;
+        const lowDons      = m.donations < 200;
+
+        const rowClass = inactive ? 'row-inactive' : (lowDons ? 'row-low-donations' : '');
+
+        const icon    = ROLE_ICON[m.role] ? ROLE_ICON[m.role] + ' ' : '';
+        const roleTxt = (ROLE_LABEL[m.role] || m.role) + icon;
+
+        return `<tr class="${rowClass}">
+          <td>${m.tag}</td>
+          <td>${m.name}</td>
+          <td>${roleTxt}</td>
+          <td>${lastSeenDate.toLocaleDateString('es-MX')}</td>
+          <td>${m.expLevel}</td>
+          <td>${m.trophies.toLocaleString()}</td>
+          <td>${m.arena.name}</td>
+          <td>${m.clanRank}</td>
+          <td>${m.donations}</td>
+          <td>${m.donationsReceived}</td>
+        </tr>`;
+      }).join('');
+
+      document.getElementById("tableWrapper").style.display = "block";
+    }
+
+    function hideTable() {
+      document.getElementById("tableWrapper").style.display = "none";
+      document.getElementById("tableHead").innerHTML = "";
+      document.getElementById("tableBody").innerHTML = "";
+    }
+
+    // ── Status ──────────────────────────────────────────────────────────
+    function setStatus(msg, type = "") {
+      const el = document.getElementById("status");
+      el.textContent = msg;
+      el.className   = type;
+    }
+
+    // ── Notas (veterano) en localStorage ───────────────────────────────
+    function saveNote(tag, value) {
+      const notes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      notes[tag]  = value;
+      localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+    }
+
+    function getNote(tag) {
+      const notes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+      return notes[tag] || '';
+    }
+
+    // ── Parser del CSV de tracking (multi-semana) ───────────────────────
+    // Formato esperado:
+    //   Fila 0: "Semana 1",,,,,,,,,,,"Semana 2",,,,,,,,,,  ...
+    //   Fila 1: Tag,Nombre,Rol,...,, Tag,Nombre,Rol,...
+    //   Fila 2+: datos
+    //
+    // Cada bloque de semana ocupa 10 columnas; los bloques están separados
+    // por una columna vacía (índice 10, 21, 32...).
+    function parseTrackingCSV(text) {
+      const lines = text.replace(/^\uFEFF/, '').replace(/\r/g, '').trim().split('\n');
+
+      if (lines.length < 3) throw new Error('El CSV no tiene suficientes filas.');
+
+      // Detectar dónde empieza cada semana (celdas no vacías en la fila 0)
+      const labelRow  = lines[0].split(',');
+      const weekStarts = [];
+      labelRow.forEach((cell, i) => {
+        if (cell.trim()) weekStarts.push(i);
+      });
+
+      if (weekStarts.length < 2) {
+        throw new Error('El CSV debe tener al menos 2 semanas para comparar.');
+      }
+
+      // Headers de la primera semana (columnas 0–9 desde su inicio)
+      const headerRow = lines[1].split(',');
+      const headers   = headerRow
+        .slice(weekStarts[0], weekStarts[0] + 10)
+        .map(h => h.trim());
+
+      // Extraer miembros de una semana dado su columna de inicio
+      function parseWeek(startCol) {
+        const members = [];
+        for (let i = 2; i < lines.length; i++) {
+          const cols = lines[i].split(',');
+          const tag  = (cols[startCol] || '').trim();
+          if (!tag) continue;
+          const obj = {};
+          headers.forEach((h, j) => {
+            obj[h] = (cols[startCol + j] || '').trim();
+          });
+          members.push(obj);
+        }
+        return members;
+      }
+
+      const firstWeek = parseWeek(weekStarts[0]);
+      const lastWeek  = parseWeek(weekStarts[weekStarts.length - 1]);
+
+      return { firstWeek, lastWeek, weekCount: weekStarts.length };
+    }
+
+    // ── Comparar semanas ────────────────────────────────────────────────
+    function comparar() {
+      const file = document.getElementById('csvFile').files[0];
+      if (!file) {
+        setDiffStatus('Carga el CSV primero.', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const { firstWeek, lastWeek, weekCount } = parseTrackingCSV(e.target.result);
+
+          const tags1 = new Set(firstWeek.map(r => r['Tag']));
+          const tagsN = new Set(lastWeek.map(r => r['Tag']));
+
+          const newMembers    = lastWeek.filter(r => !tags1.has(r['Tag']));
+          const leftMembers   = firstWeek.filter(r => !tagsN.has(r['Tag']));
+          const stayedMembers = lastWeek.filter(r => tags1.has(r['Tag']));
+
+          renderDiff(newMembers, leftMembers, stayedMembers);
+          setDiffStatus(
+            `✓ ${weekCount} semana${weekCount > 1 ? 's' : ''} analizadas — ` +
+            `Semana 1 vs Semana ${weekCount}.`,
+            'success'
+          );
+        } catch (err) {
+          setDiffStatus(`Error: ${err.message}`, 'error');
+          document.getElementById('diffResults').classList.remove('visible');
+        }
+      };
+      reader.readAsText(file, 'utf-8');
+    }
+
+    // ── Render del diff ─────────────────────────────────────────────────
+    function renderDiff(newMembers, leftMembers, stayedMembers) {
+      document.getElementById('headerNew').textContent    = `Nuevos — ${newMembers.length}`;
+      document.getElementById('headerLeft').textContent   = `Se fueron — ${leftMembers.length}`;
+      document.getElementById('headerStayed').textContent = `Permanecen — ${stayedMembers.length}`;
+
+      document.getElementById('bodyNew').innerHTML    = diffRows(newMembers,    'row-new',  true);
+      document.getElementById('bodyLeft').innerHTML   = diffRows(leftMembers,   'row-left', false);
+      document.getElementById('bodyStayed').innerHTML = diffRows(stayedMembers, '',         true);
+
+      document.getElementById('diffResults').classList.add('visible');
+    }
+
+    function diffRows(members, rowClass, withNote) {
+      if (!members.length) {
+        const cols = withNote ? 7 : 6;
+        return `<tr class="empty-row"><td colspan="${cols}">— ninguno —</td></tr>`;
+      }
+
+      return members.map(m => {
+        const tag     = m['Tag']  || '';
+        const roleTxt = m['Rol'] || '';
+        const roleIcon = ROLE_ICON_BY_LABEL[roleTxt] ?? '';
+        const roleDisplay = roleIcon ? `${roleTxt} ${roleIcon}` : roleTxt;
+        const note = withNote
+          ? `<td><input
+               class="note-input"
+               type="text"
+               placeholder="Anotación..."
+               value="${escHtml(getNote(tag))}"
+               data-tag="${escHtml(tag)}"
+               oninput="saveNote(this.dataset.tag, this.value)"
+             /></td>`
+          : '';
+
+        return `<tr class="${rowClass}">
+          <td>${escHtml(tag)}</td>
+          <td>${escHtml(m['Nombre'] || '')}</td>
+          <td>${escHtml(roleDisplay)}</td>
+          <td>${escHtml(m['Trofeos'] || '')}</td>
+          <td>${escHtml(m['Donaciones'] || '')}</td>
+          <td>${escHtml(m['Donaciones Recibidas'] || '')}</td>
+          ${note}
+        </tr>`;
+      }).join('');
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function setDiffStatus(msg, type = '') {
+      const el = document.getElementById('diffStatus');
+      el.textContent = msg;
+      el.className   = type;
+    }
+
+    // ── Carga inicial con mock ──────────────────────────────────────────
+    const USE_MOCK = false;
+    if (USE_MOCK) {
+      loadMembers(MOCK.items);
+      setStatus(`Vista previa: ${MOCK.items.length} miembros (mock).`, "success");
+    }
+  </script>
+
+</body>
+</html>
