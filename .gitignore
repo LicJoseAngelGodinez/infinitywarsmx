@@ -20,6 +20,11 @@ desktop.ini
 .claude/
 CLAUDE.md
 
+# Datos del clan (snapshots/exports con info real de miembros)
+currentriverrace.json
+riverracelog.json
+register/
+
 # Node (por si se agrega en el futuro)
 node_modules/
 dist/
