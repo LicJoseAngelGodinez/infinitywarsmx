@@ -356,7 +356,7 @@
 
     <label style="flex-direction: row; align-items: center; gap: 0.5rem; cursor: pointer;">
       <input type="checkbox" id="useEnvKey" onchange="toggleEnvKey()" style="cursor: pointer;" />
-      Usar API key configurada en Vercel (CLASH_API_KEY)
+      Usar ENV KEY
     </label>
 
     <div class="btn-row">
@@ -489,6 +489,12 @@
     const API_URL_CURRENT_WAR = "https://proxy.royaleapi.dev/v1/clans/%23228PYJ08/currentriverrace";
     const API_URL_WAR_LOG     = "https://proxy.royaleapi.dev/v1/clans/%23228PYJ08/riverracelog?limit=50";
 
+    // Absoluta a propósito: cuando esta página se sirve vía rewrite desde
+    // mipagina.com/gaming, un fetch a ruta relativa ("/api/key") resolvería
+    // contra el dominio del portafolio (donde esa función no existe), no
+    // contra este proyecto. Apuntamos directo al dominio real de Vercel.
+    const API_KEY_ENDPOINT = "https://infinitywarsmx.vercel.app/api/key";
+
     // Fecha desde la que se lleva registro del clan. Útil a futuro para
     // calcular tiempo en el clan por miembro.
     const TRACKING_SINCE = new Date('2026-03-01');
@@ -530,7 +536,7 @@
     }
 
     async function fetchEnvApiKey() {
-      const res = await fetch('/api/key');
+      const res = await fetch(API_KEY_ENDPOINT);
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));

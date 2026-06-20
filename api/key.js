@@ -1,4 +1,8 @@
 module.exports = (req, res) => {
+  // Se llama cross-origin desde www.angel-godinez.com/gaming (rewrite que no
+  // cambia el origen del navegador), así que necesita el header CORS.
+  res.setHeader('Access-Control-Allow-Origin', '*');
+
   const apiKey = process.env.CLASH_API_KEY;
 
   if (!apiKey) {
