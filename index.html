@@ -104,9 +104,15 @@
     }
 
     .btn-row-csv {
-      display: flex;
-      grid-template-columns: repeat(3, 1fr);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 4px;
+      width: 100%;
+    }
+
+    .btn-row-csv button {
+      min-width: 0;
+      padding: 0.65rem 0.5rem;
     }
 
     button {
@@ -396,6 +402,8 @@
     </div>
   </div>
 
+  <div id="memberCountBanner" class="diff-block-header stayed-header" style="display:none; width:100%; max-width:1100px; border-radius:10px;"></div>
+
   <div id="tableWrapper">
     <table>
       <thead id="tableHead"></thead>
@@ -410,6 +418,7 @@
   <details class="accordion" id="currentWarWrapper">
     <summary id="currentWarTitle">Guerra actual — sin datos aún</summary>
     <div class="accordion-body">
+      <div id="currentWarBanner" class="diff-block-header stayed-header" style="border-radius:10px;"></div>
       <div style="width:100%; overflow-x:auto; border-radius:10px; border:1px solid #0f3460;">
         <table>
           <thead><tr>
@@ -485,6 +494,7 @@
   <script>
     // ── Constantes generales ────────────────────────────────────────────
     const CLAN_TAG = '#228PYJ08';
+    const MAX_CLAN_SIZE = 50;
     const API_URL             = "https://proxy.royaleapi.dev/v1/clans/%23228PYJ08/members";
     const API_URL_CURRENT_WAR = "https://proxy.royaleapi.dev/v1/clans/%23228PYJ08/currentriverrace";
     const API_URL_WAR_LOG     = "https://proxy.royaleapi.dev/v1/clans/%23228PYJ08/riverracelog?limit=50";
@@ -792,10 +802,15 @@
         </tr>`;
       }).join('');
 
+      const banner = document.getElementById("memberCountBanner");
+      banner.textContent = `👥 ${members.length}/${MAX_CLAN_SIZE} miembros`;
+      banner.style.display = "block";
+
       document.getElementById("tableWrapper").style.display = "block";
     }
 
     function hideTable() {
+      document.getElementById("memberCountBanner").style.display = "none";
       document.getElementById("tableWrapper").style.display = "none";
       document.getElementById("tableHead").innerHTML = "";
       document.getElementById("tableBody").innerHTML = "";
@@ -968,18 +983,25 @@
     }
 
     function renderCurrentWarClan(currentWarJson) {
-      const title = document.getElementById('currentWarTitle');
-      const body  = document.getElementById('currentWarBody');
+      const title  = document.getElementById('currentWarTitle');
+      const body   = document.getElementById('currentWarBody');
+      const banner = document.getElementById('currentWarBanner');
 
       if (!currentWarJson || !currentWarJson.clan) {
         title.textContent = 'Guerra actual — no se pudo cargar (revisa tu API key o vuelve a intentar)';
         body.innerHTML = '';
+        banner.textContent = '';
         return;
       }
 
       const c = currentWarJson.clan;
       title.textContent =
         `Guerra actual — ${c.name} · Fama ${c.fame.toLocaleString()} · Puntos de periodo ${c.periodPoints.toLocaleString()} · Clan Score ${c.clanScore.toLocaleString()}`;
+
+      const total      = c.participants.length;
+      const playing    = c.participants.filter(p => p.decksUsed > 0).length;
+      const percentage = total ? Math.round((playing / total) * 100) : 0;
+      banner.textContent = `👥 ${playing}/${total} miembros participando (${percentage}%)`;
 
       const sorted = [...c.participants].sort((a, b) => b.fame - a.fame);
 
