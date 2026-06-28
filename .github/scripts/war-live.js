@@ -49,7 +49,13 @@ async function run() {
     donations_received: m.donationsReceived ?? 0,
     last_seen:          m.lastSeen          ?? null,
   }));
-  await supabaseUpsert('member_snapshots', memberRows);
+  const zeroCount = memberRows.filter(m => m.donations === 0 && m.donations_received === 0).length;
+  if (zeroCount / memberRows.length >= 0.9) {
+    console.log(`⚠️ member_snapshots omitido: ${zeroCount}/${memberRows.length} miembros con 0/0 donaciones — probable reset semanal`);
+  } else {
+    await supabaseUpsert('member_snapshots', memberRows);
+    console.log(`✅ member_snapshots: ${memberRows.length} filas actualizadas para ${today}`);
+  }
 
   // 2. Fetch guerra en curso
   const war = await clashFetch(`/clans/${CLAN_TAG}/currentriverrace`);
