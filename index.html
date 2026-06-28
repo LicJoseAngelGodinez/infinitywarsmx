@@ -432,7 +432,7 @@
       </table>
       <details style="padding:0.5rem 0.75rem; font-size:0.78rem; color:#aaa; border-top:1px solid #0f3460;">
         <summary style="cursor:pointer; color:#f0c040; list-style:none; outline:none;">¿Cómo se calcula?</summary>
-        <p style="margin-top:0.4rem; line-height:1.5;">Top 5 miembros sin rango que cubren el umbral de donaciones y tienen mejor participación en guerra: mazos usados, fama y donaciones como desempate. Son candidatos a veterano.</p>
+        <p style="margin-top:0.4rem; line-height:1.5;">Top 5 miembros sin rango que cubren el umbral de donaciones y han usado ≥75% de sus mazos disponibles en batalla (ej. día 4 = 12/16 mazos mínimo). En entrenamiento solo aplica el filtro de donaciones.</p>
       </details>
     </div>
   </div>
@@ -893,8 +893,15 @@
         }).join('');
       }
 
-      // Futuros Veteranos: top 5 miembros (role 'member') que cubren el umbral de donaciones
-      const memberPlayers = members.filter(m => m.role === 'member' && m.donations >= MIN_DONATIONS);
+      // Futuros Veteranos: role 'member', cumple donaciones y ≥75% de mazos si es día de batalla
+      const { periodDay: warPeriodDay } = getWarDayInfo();
+      const isWarDay      = currentWarJson?.periodType === 'warDay';
+      const deckThreshold = isWarDay ? Math.ceil(warPeriodDay * 4 * 0.75) : 0;
+      const memberPlayers = members.filter(m => {
+        if (m.role !== 'member' || m.donations < MIN_DONATIONS) return false;
+        if (isWarDay) return (participantsByTag[m.tag]?.decksUsed ?? 0) >= deckThreshold;
+        return true;
+      });
       const futureVetsEl  = document.getElementById('mvpFutureVetsWrapper');
       if (!memberPlayers.length) {
         futureVetsEl.style.display = 'none';
