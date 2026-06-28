@@ -2,7 +2,7 @@ name: war-live
 
 on:
   schedule:
-    - cron: '0 6,8,10,12,14,16,18,20,22 * * *'  # Cada 2h de 6:00 a 22:00 UTC
+    - cron: '0 0,2,4,12,14,16,18,20,22 * * *'  # Cada 2h, pausa 5am-12pm UTC (madrugada México)
   workflow_dispatch:                               # Disparo manual para pruebas
 
 jobs:

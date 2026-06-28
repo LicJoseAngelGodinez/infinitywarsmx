@@ -39,9 +39,21 @@ async function run() {
   const ownStanding = latestWar.standings?.find(s => s.clan?.tag === OWN_TAG);
   if (!ownStanding) throw new Error(`Clan ${OWN_TAG} no encontrado en standings`);
 
-  // 4. Derivar season_id del finishTime ("YYYY-MM" del mes de la guerra)
-  const finishDate = parseClashDate(ownStanding.clan?.finishTime);
-  const seasonId   = `${finishDate.getUTCFullYear()}-${String(finishDate.getUTCMonth() + 1).padStart(2, '0')}`;
+  // 4. Derivar season_id ("YYYY-MM" del mes de la guerra)
+  // Debug: loggear los campos de fecha disponibles para diagnosticar el formato real
+  console.log('DEBUG finishTime (clan):', ownStanding.clan?.finishTime);
+  console.log('DEBUG createdDate (war):', latestWar.createdDate);
+  console.log('DEBUG sectionIndex:', latestWar.sectionIndex);
+
+  // Intentar parsear finishTime; si falla o no existe, usar "ayer" como fallback
+  // (el cron corre el lunes, la guerra terminó el domingo → ayer = mes correcto)
+  let finishDate = parseClashDate(ownStanding.clan?.finishTime ?? latestWar.createdDate);
+  if (isNaN(finishDate.getTime()) || finishDate.getUTCFullYear() < 2020) {
+    console.log('⚠️  finishTime inválido, usando fecha de ayer como fallback');
+    finishDate = new Date();
+    finishDate.setUTCDate(finishDate.getUTCDate() - 1); // domingo = día de fin de guerra
+  }
+  const seasonId = `${finishDate.getUTCFullYear()}-${String(finishDate.getUTCMonth() + 1).padStart(2, '0')}`;
 
   const sectionIndex  = latestWar.sectionIndex ?? 0;
   const clanRank      = ownStanding.rank        ?? 0;
