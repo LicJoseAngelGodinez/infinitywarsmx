@@ -61,6 +61,11 @@ async function run() {
     console.log('⏸️ member_snapshots pausado: ventana de corte semanal (Dom 22:30–Lun 09:30 UTC)');
   } else {
     await supabaseUpsert('member_snapshots', memberRows);
+    await supabaseUpsert('app_settings', [{
+      key:        'members_snapshot_ts',
+      value:      nowUTC.toISOString(),
+      updated_at: nowUTC.toISOString(),
+    }]);
     console.log(`✅ member_snapshots: ${memberRows.length} filas actualizadas para ${today}`);
   }
 

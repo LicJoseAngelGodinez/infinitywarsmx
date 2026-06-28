@@ -617,17 +617,14 @@
       setStatus(`✓ ${members.length} miembros cargados.`, "success");
 
       // Banner de fechas de actualización
+      const fmtMX = ts => new Date(ts).toLocaleString('es-MX', {
+        timeZone: 'America/Mexico_City', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+      });
       const stamps = [];
-      if (membersJson.snapshot_date) {
-        const d = new Date(membersJson.snapshot_date + 'T12:00:00Z');
-        stamps.push(`Miembros: ${d.toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })}`);
-      }
-      if (currentWarJson?.snapshot_ts) {
-        const ts = new Date(currentWarJson.snapshot_ts);
-        stamps.push(`Guerra en vivo: ${ts.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}`);
-      }
+      if (currentWarJson?.snapshot_ts)       stamps.push(`📡 Última actualización de guerra: ${fmtMX(currentWarJson.snapshot_ts)}`);
+      if (membersJson.members_snapshot_ts)   stamps.push(`👥 Actualización de roster: ${fmtMX(membersJson.members_snapshot_ts)}`);
       const stampsEl = document.getElementById('dataTimestamps');
-      stampsEl.innerHTML = stamps.length ? '📅 ' + stamps.join(' &nbsp;·&nbsp; ') : '';
+      stampsEl.innerHTML = stamps.join('<br>');
       stampsEl.style.display = stamps.length ? 'block' : 'none';
 
       btn.disabled = false;

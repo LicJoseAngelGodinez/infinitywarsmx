@@ -23,7 +23,12 @@ module.exports = async (req, res) => {
     const membersRes = await supaFetch(`member_snapshots?snapshot_date=eq.${snapshot_date}&order=clan_rank.asc`);
     const members    = await membersRes.json();
 
-    // 3. Estado de guerra en vivo para cruzar datos de participación
+    // 3. Timestamp de última actualización del roster
+    const tsRes  = await supaFetch('app_settings?key=eq.members_snapshot_ts&select=value');
+    const tsRows = await tsRes.json();
+    const members_snapshot_ts = tsRows[0]?.value ?? null;
+
+    // 4. Estado de guerra en vivo para cruzar datos de participación
     const warRes  = await supaFetch('war_live?select=tag,decks_used,decks_used_today,boat_attacks,fame');
     const warRows = await warRes.json();
     const warByTag = {};
@@ -46,9 +51,9 @@ module.exports = async (req, res) => {
       boatAttacks:       warByTag[m.tag]?.boat_attacks     ?? 0,
     }));
 
-    // Cache 5 min en Vercel edge — el snapshot es diario, no cambia más seguido
+    // Cache 5 min en Vercel edge
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
-    res.status(200).json({ snapshot_date, items });
+    res.status(200).json({ snapshot_date, members_snapshot_ts, items });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
