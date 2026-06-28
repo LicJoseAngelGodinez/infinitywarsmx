@@ -23,8 +23,8 @@ module.exports = async (req, res) => {
     const membersRes = await supaFetch(`member_snapshots?snapshot_date=eq.${snapshot_date}&order=clan_rank.asc`);
     const members    = await membersRes.json();
 
-    // 3. Estado de guerra en vivo para cruzar mazos del día y ataques a barco
-    const warRes  = await supaFetch('war_live?select=tag,decks_used_today,boat_attacks,fame');
+    // 3. Estado de guerra en vivo para cruzar datos de participación
+    const warRes  = await supaFetch('war_live?select=tag,decks_used,decks_used_today,boat_attacks,fame');
     const warRows = await warRes.json();
     const warByTag = {};
     warRows.forEach(p => { warByTag[p.tag] = p; });
@@ -40,7 +40,9 @@ module.exports = async (req, res) => {
       donations:         m.donations,
       donationsReceived: m.donations_received,
       lastSeen:          m.last_seen,
+      decksUsed:         warByTag[m.tag]?.decks_used      ?? 0,
       decksUsedToday:    warByTag[m.tag]?.decks_used_today ?? 0,
+      fame:              warByTag[m.tag]?.fame             ?? 0,
       boatAttacks:       warByTag[m.tag]?.boat_attacks     ?? 0,
     }));
 
