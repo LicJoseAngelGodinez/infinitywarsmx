@@ -317,12 +317,20 @@
       max-width: 1100px;
     }
 
+    #currentWarWrapper {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 10px;
+      padding: 0 1.25rem;
+    }
+
     .accordion summary {
       cursor: pointer;
       color: #f0c040;
       font-size: 1rem;
+      font-weight: 600;
       letter-spacing: 0.5px;
-      padding: 0.65rem 0;
+      padding: 0.85rem 0;
       list-style: none;
     }
 
@@ -616,7 +624,7 @@
       }
       if (currentWarJson?.snapshot_ts) {
         const ts = new Date(currentWarJson.snapshot_ts);
-        stamps.push(`Guerra en vivo: ${ts.toLocaleDateString('es-MX', { day: '2-digit', month: 'short' })} ${ts.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}`);
+        stamps.push(`Guerra en vivo: ${ts.toLocaleString('es-MX', { timeZone: 'America/Mexico_City', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}`);
       }
       const stampsEl = document.getElementById('dataTimestamps');
       stampsEl.innerHTML = stamps.length ? '📅 ' + stamps.join(' &nbsp;·&nbsp; ') : '';

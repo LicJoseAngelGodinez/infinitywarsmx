@@ -30,10 +30,26 @@ async function supabaseUpsert(table, rows) {
 }
 
 async function run() {
-  // 1. Fetch members para tener el mapa tag → role
+  const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+  // 1. Fetch members para tener el mapa tag → role y actualizar snapshot del día
   const membersData = await clashFetch(`/clans/${CLAN_TAG}/members`);
   const roleByTag = {};
   (membersData.items ?? []).forEach(m => { roleByTag[m.tag] = m.role; });
+
+  const memberRows = (membersData.items ?? []).map(m => ({
+    snapshot_date:      today,
+    tag:                m.tag,
+    name:               m.name,
+    role:               m.role,
+    trophies:           m.trophies          ?? 0,
+    arena:              m.arena?.name       ?? null,
+    clan_rank:          m.clanRank          ?? 0,
+    donations:          m.donations         ?? 0,
+    donations_received: m.donationsReceived ?? 0,
+    last_seen:          m.lastSeen          ?? null,
+  }));
+  await supabaseUpsert('member_snapshots', memberRows);
 
   // 2. Fetch guerra en curso
   const war = await clashFetch(`/clans/${CLAN_TAG}/currentriverrace`);
@@ -70,6 +86,7 @@ async function run() {
     updated_at: now,
   }]);
 
+  console.log(`✅ member_snapshots: ${memberRows.length} filas actualizadas para ${today}`);
   console.log(`✅ war_live: ${rows.length} participantes | periodType: ${war.periodType} | semana: ${(war.sectionIndex ?? 0) + 1}`);
 }
 
