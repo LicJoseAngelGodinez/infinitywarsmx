@@ -49,9 +49,16 @@ async function run() {
     donations_received: m.donationsReceived ?? 0,
     last_seen:          m.lastSeen          ?? null,
   }));
-  const zeroCount = memberRows.filter(m => m.donations === 0 && m.donations_received === 0).length;
-  if (zeroCount / memberRows.length >= 0.9) {
-    console.log(`⚠️ member_snapshots omitido: ${zeroCount}/${memberRows.length} miembros con 0/0 donaciones — probable reset semanal`);
+  // Pausa Dom 22:30 UTC (5:30pm Cancún) → Lun 09:30 UTC para proteger el
+  // snapshot final de la semana antes del reset semanal de Clash (~23:00 UTC).
+  const nowUTC = new Date();
+  const day = nowUTC.getUTCDay();    // 0=Dom, 1=Lun
+  const mins = nowUTC.getUTCHours() * 60 + nowUTC.getUTCMinutes();
+  const inBlackout = (day === 0 && mins >= 22 * 60 + 30) ||
+                     (day === 1 && mins <   9 * 60 + 30);
+
+  if (inBlackout) {
+    console.log('⏸️ member_snapshots pausado: ventana de corte semanal (Dom 22:30–Lun 09:30 UTC)');
   } else {
     await supabaseUpsert('member_snapshots', memberRows);
     console.log(`✅ member_snapshots: ${memberRows.length} filas actualizadas para ${today}`);
