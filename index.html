@@ -432,7 +432,7 @@
       </table>
       <details style="padding:0.5rem 0.75rem; font-size:0.78rem; color:#aaa; border-top:1px solid #0f3460;">
         <summary style="cursor:pointer; color:#f0c040; list-style:none; outline:none;">¿Cómo se calcula?</summary>
-        <p style="margin-top:0.4rem; line-height:1.5;">Top 5 miembros sin rango con mejor participación en guerra: mazos usados, fama y donaciones como desempate. Son candidatos a veterano.</p>
+        <p style="margin-top:0.4rem; line-height:1.5;">Top 5 miembros sin rango que cubren el umbral de donaciones y tienen mejor participación en guerra: mazos usados, fama y donaciones como desempate. Son candidatos a veterano.</p>
       </details>
     </div>
   </div>
@@ -685,6 +685,7 @@
 
       if (currentMembers.length) {
         renderTable(currentMembers, lastCurrentWarJson);
+        renderMVPs(currentMembers, lastCurrentWarJson);
       }
     }
 
@@ -892,8 +893,8 @@
         }).join('');
       }
 
-      // Futuros Veteranos: top 5 miembros (role 'member') por participación
-      const memberPlayers = members.filter(m => m.role === 'member');
+      // Futuros Veteranos: top 5 miembros (role 'member') que cubren el umbral de donaciones
+      const memberPlayers = members.filter(m => m.role === 'member' && m.donations >= MIN_DONATIONS);
       const futureVetsEl  = document.getElementById('mvpFutureVetsWrapper');
       if (!memberPlayers.length) {
         futureVetsEl.style.display = 'none';
