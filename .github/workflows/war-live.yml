@@ -1,0 +1,21 @@
+name: war-live
+
+on:
+  schedule:
+    - cron: '0 6,8,10,12,14,16,18,20,22 * * *'  # Cada 2h de 6:00 a 22:00 UTC
+  workflow_dispatch:                               # Disparo manual para pruebas
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Update war live snapshot
+        env:
+          CLASH_API_KEY:       ${{ secrets.CLASH_API_KEY }}
+          SUPABASE_URL:        ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+        run: node .github/scripts/war-live.js

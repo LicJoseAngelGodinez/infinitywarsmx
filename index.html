@@ -404,6 +404,37 @@
 
   <div id="memberCountBanner" class="diff-block-header stayed-header" style="display:none; width:100%; max-width:1100px; border-radius:10px;"></div>
 
+  <div id="mvpWrapper" style="display:none; width:100%; max-width:1100px; gap:1rem; flex-wrap:wrap;">
+    <div class="diff-block" style="flex:1; min-width:280px;">
+      <div class="diff-block-header stayed-header">🏆 MVP — Donaciones</div>
+      <table>
+        <thead><tr>
+          <th>#</th><th>Nombre</th><th>Donaciones</th>
+        </tr></thead>
+        <tbody id="mvpDonationsBody"></tbody>
+      </table>
+      <details style="padding:0.5rem 0.75rem; font-size:0.78rem; color:#aaa; border-top:1px solid #0f3460;">
+        <summary style="cursor:pointer; color:#f0c040; list-style:none; outline:none;">¿Cómo se calcula?</summary>
+        <p style="margin-top:0.4rem; line-height:1.5;">Top 5 miembros con más cartas donadas en la semana actual, ordenados de mayor a menor.</p>
+      </details>
+    </div>
+    <div class="diff-block" style="flex:1; min-width:280px;">
+      <div class="diff-block-header stayed-header">⚔️ MVP — Participación</div>
+      <table>
+        <thead><tr>
+          <th>#</th><th>Nombre</th><th>Fama</th>
+        </tr></thead>
+        <tbody id="mvpParticipationBody"></tbody>
+      </table>
+      <details style="padding:0.5rem 0.75rem; font-size:0.78rem; color:#aaa; border-top:1px solid #0f3460;">
+        <summary style="cursor:pointer; color:#f0c040; list-style:none; outline:none;">¿Cómo se calcula?</summary>
+        <p style="margin-top:0.4rem; line-height:1.5;">Top 5 ordenados por: 1) mazos usados (mayor a menor), 2) fama acumulada como desempate, 3) donaciones como último desempate.</p>
+      </details>
+    </div>
+  </div>
+
+  <div id="rosterHeader" class="diff-block-header stayed-header" style="display:none; width:100%; max-width:1100px; border-radius:10px; border:1px solid #0f3460;">📋 Roster del Clan</div>
+
   <div id="tableWrapper">
     <table>
       <thead id="tableHead"></thead>
@@ -414,6 +445,8 @@
 
   <hr class="divider" />
 
+  <div id="warStatusBanner" style="display:none; width:100%; max-width:1100px; border-radius:10px; border:1px solid transparent; padding:0.6rem 1.25rem; flex-direction:column; gap:0.2rem; align-items:center; text-align:center;"></div>
+
   <!-- ── Guerra actual (solo nuestro clan) ───────────────────────────── -->
   <details class="accordion" id="currentWarWrapper">
     <summary id="currentWarTitle">Guerra actual — sin datos aún</summary>
@@ -422,7 +455,7 @@
       <div style="width:100%; overflow-x:auto; border-radius:10px; border:1px solid #0f3460;">
         <table>
           <thead><tr>
-            <th>Tag</th><th>Nombre</th><th>Fama</th><th>Mazos Usados</th><th>Mazos Hoy</th><th>🚢 Ataques</th>
+            <th>Tag</th><th>Nombre</th><th>Rol</th><th>Fama</th><th>Mazos Usados</th><th>Mazos Hoy</th><th>🚢 Ataques</th>
           </tr></thead>
           <tbody id="currentWarBody"></tbody>
         </table>
@@ -509,11 +542,11 @@
     // calcular tiempo en el clan por miembro.
     const TRACKING_SINCE = new Date('2026-03-01');
 
-    const ROLE_ICON  = { leader: '👑', coLeader: '🛡️', elder: '👤', member: '' };
+    const ROLE_ICON  = { leader: '👑', coLeader: '🛡️', elder: '⚔️', member: '👤' };
     const ROLE_LABEL = { leader: 'Líder', coLeader: 'Colíder', elder: 'Veterano', member: 'Miembro' };
 
     // Mapa inverso para el diff (los CSV ya traen el label en español)
-    const ROLE_ICON_BY_LABEL = { 'Líder': '👑', 'Colíder': '🛡️', 'Veterano': '👤', 'Miembro': '' };
+    const ROLE_ICON_BY_LABEL = { 'Líder': '👑', 'Colíder': '🛡️', 'Veterano': '⚔️', 'Miembro': '👤' };
 
     // Clave en localStorage para las notas de candidatos a veterano
     const NOTES_KEY = 'clan-vet-notes';
@@ -626,6 +659,8 @@
       currentData        = transformToExcelFormat(members);
       lastCurrentWarJson  = currentWarJson;
       renderTable(members, currentWarJson);
+      renderMVPs(members, currentWarJson);
+      renderWarStatusBanner(currentWarJson);
       renderCurrentWarClan(currentWarJson);
       renderWarLogClan(warLogJson);
       document.getElementById("downloadBtn").disabled = false;
@@ -809,11 +844,64 @@
       document.getElementById("tableWrapper").style.display = "block";
     }
 
+    function renderMVPs(members, currentWarJson) {
+      // Top 5 por donaciones
+      const topDonators = [...members]
+        .sort((a, b) => b.donations - a.donations)
+        .slice(0, 5);
+
+      document.getElementById('mvpDonationsBody').innerHTML = topDonators.map((m, i) => {
+        const icon = ROLE_ICON[m.role] || '';
+        return `<tr>
+          <td>${i + 1}</td>
+          <td>${m.name}${icon ? ' ' + icon : ''}</td>
+          <td>${m.donations} ⬆️</td>
+        </tr>`;
+      }).join('');
+
+      // Top 5: mazos DESC → fama DESC → donaciones DESC
+      const participantsByTag = {};
+      if (currentWarJson && currentWarJson.clan && currentWarJson.clan.participants) {
+        currentWarJson.clan.participants.forEach(p => { participantsByTag[p.tag] = p; });
+      }
+
+      const hasWarData = Object.keys(participantsByTag).length > 0;
+
+      if (!hasWarData) {
+        document.getElementById('mvpParticipationBody').innerHTML =
+          '<tr class="empty-row"><td colspan="3">— sin datos de guerra —</td></tr>';
+      } else {
+        const topParticipants = [...members]
+          .map(m => {
+            const p = participantsByTag[m.tag];
+            return { ...m, decksUsed: p?.decksUsed ?? 0, fame: p?.fame ?? 0 };
+          })
+          .sort((a, b) => b.decksUsed - a.decksUsed || b.fame - a.fame || b.donations - a.donations)
+          .slice(0, 5);
+
+        document.getElementById('mvpParticipationBody').innerHTML = topParticipants.map((m, i) => {
+          const icon = ROLE_ICON[m.role] || '';
+          return `<tr>
+            <td>${i + 1}</td>
+            <td>${m.name}${icon ? ' ' + icon : ''}</td>
+            <td>${m.fame}</td>
+          </tr>`;
+        }).join('');
+      }
+
+      document.getElementById('mvpWrapper').style.display = 'flex';
+      document.getElementById('rosterHeader').style.display = 'block';
+    }
+
     function hideTable() {
       document.getElementById("memberCountBanner").style.display = "none";
       document.getElementById("tableWrapper").style.display = "none";
       document.getElementById("tableHead").innerHTML = "";
       document.getElementById("tableBody").innerHTML = "";
+      document.getElementById("warStatusBanner").style.display = "none";
+      document.getElementById("mvpWrapper").style.display = "none";
+      document.getElementById("rosterHeader").style.display = "none";
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
     }
 
     // ── Status ──────────────────────────────────────────────────────────
@@ -982,6 +1070,89 @@
       el.className   = type;
     }
 
+    // ── Estado de guerra y countdown ────────────────────────────────────
+    function getWarDayInfo() {
+      const ahora = new Date();
+      let utcDay = ahora.getUTCDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
+
+      // Antes de las 10:00 UTC seguimos en el día de juego anterior
+      if (ahora.getUTCHours() < 10) {
+        utcDay = (utcDay + 6) % 7;
+      }
+
+      const map = {
+        1: { periodDay: 1, expectedType: 'training' },
+        2: { periodDay: 2, expectedType: 'training' },
+        3: { periodDay: 3, expectedType: 'training' },
+        4: { periodDay: 1, expectedType: 'warDay'   },
+        5: { periodDay: 2, expectedType: 'warDay'   },
+        6: { periodDay: 3, expectedType: 'warDay'   },
+        0: { periodDay: 4, expectedType: 'warDay'   },
+      };
+      return map[utcDay] || { periodDay: 1, expectedType: 'training' };
+    }
+
+    let countdownInterval = null;
+
+    function startCountdown() {
+      if (countdownInterval) clearInterval(countdownInterval);
+
+      function tick() {
+        const el = document.getElementById('warCountdown');
+        if (!el) return;
+
+        const ahora = new Date();
+        let objetivo = Date.UTC(
+          ahora.getUTCFullYear(),
+          ahora.getUTCMonth(),
+          ahora.getUTCDate(),
+          9, 45, 17
+        );
+        let diferencia = objetivo - ahora.getTime();
+        if (diferencia < 0) diferencia += 24 * 60 * 60 * 1000;
+
+        const h = Math.floor(diferencia / 3600000);
+        const m = Math.floor((diferencia % 3600000) / 60000);
+        const s = Math.floor((diferencia % 60000) / 1000);
+
+        el.textContent = `⏱ Reinicio en ${pad2(h)}:${pad2(m)}:${pad2(s)}`;
+      }
+
+      tick();
+      countdownInterval = setInterval(tick, 1000);
+    }
+
+    function renderWarStatusBanner(currentWarJson) {
+      const el = document.getElementById('warStatusBanner');
+
+      if (!currentWarJson) {
+        el.style.display = 'none';
+        if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+        return;
+      }
+
+      const periodType   = currentWarJson.periodType   || '';
+      const sectionIndex = currentWarJson.sectionIndex ?? 0;
+      const week         = sectionIndex + 1;
+      const { periodDay } = getWarDayInfo();
+      const isWar = periodType === 'warDay';
+
+      if (isWar) {
+        el.style.background  = 'rgba(255, 90, 90, 0.13)';
+        el.style.borderColor = 'rgba(255, 90, 90, 0.35)';
+        el.style.color       = '#ff8080';
+        el.innerHTML = `<div style="font-size:1.05rem;font-weight:700;letter-spacing:0.5px;">⚔️ SEMANA ${week} — DÍA DE BATALLA ${periodDay}</div><div id="warCountdown" style="font-size:0.8rem;color:#aaa;margin-top:0.2rem;"></div>`;
+      } else {
+        el.style.background  = 'rgba(107, 255, 184, 0.08)';
+        el.style.borderColor = 'rgba(107, 255, 184, 0.25)';
+        el.style.color       = '#6bffb8';
+        el.innerHTML = `<div style="font-size:1.05rem;font-weight:700;letter-spacing:0.5px;">🛡️ SEMANA ${week} — DÍA DE ENTRENAMIENTO ${periodDay}</div><div id="warCountdown" style="font-size:0.8rem;color:#aaa;margin-top:0.2rem;"></div>`;
+      }
+
+      el.style.display = 'flex';
+      startCountdown();
+    }
+
     function renderCurrentWarClan(currentWarJson) {
       const title  = document.getElementById('currentWarTitle');
       const body   = document.getElementById('currentWarBody');
@@ -1003,13 +1174,21 @@
       const percentage = total ? Math.round((playing / total) * 100) : 0;
       banner.textContent = `👥 ${playing}/${total} miembros participando (${percentage}%)`;
 
+      const roleByTag = {};
+      currentMembers.forEach(m => { roleByTag[m.tag] = m.role; });
+
       const sorted = [...c.participants].sort((a, b) => b.fame - a.fame);
 
       body.innerHTML = sorted.map(p => {
-        const rowClass = p.decksUsed === 0 ? 'row-inactive' : '';
+        const rowClass    = p.decksUsed === 0 ? 'row-inactive' : '';
+        const role        = roleByTag[p.tag];
+        const roleLabel   = role ? (ROLE_LABEL[role] || '') : '';
+        const roleIcon    = role ? (ROLE_ICON[role]  || '') : '';
+        const roleDisplay = roleIcon ? `${roleLabel} ${roleIcon}` : roleLabel;
         return `<tr class="${rowClass}">
           <td>${p.tag}</td>
           <td>${p.name}</td>
+          <td>${roleDisplay}</td>
           <td>${p.fame}</td>
           <td>${p.decksUsed}</td>
           <td>${p.decksUsedToday}</td>
