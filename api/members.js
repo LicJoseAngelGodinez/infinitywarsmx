@@ -51,8 +51,8 @@ module.exports = async (req, res) => {
       boatAttacks:       warByTag[m.tag]?.boat_attacks     ?? 0,
     }));
 
-    // Cache 5 min en Vercel edge
-    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate');
+    // Cache 5 min en Vercel edge; stale-while-revalidate acotado a 30s para evitar servir datos muy viejos
+    res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=30');
     res.status(200).json({ snapshot_date, members_snapshot_ts, items });
   } catch (err) {
     res.status(500).json({ error: err.message });

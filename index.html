@@ -618,7 +618,7 @@
 
       // Banner de fechas de actualización
       const fmtMX = ts => new Date(ts).toLocaleString('es-MX', {
-        timeZone: 'America/Cancun', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+        timeZone: 'America/Cancun', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false
       });
       const stamps = [];
       if (currentWarJson?.snapshot_ts)       stamps.push(`📡 Última actualización de guerra: ${fmtMX(currentWarJson.snapshot_ts)}`);
