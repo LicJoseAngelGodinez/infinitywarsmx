@@ -366,8 +366,6 @@
       <button class="primary" id="fetchBtn" onclick="fetchMembers()">Cargar Data</button>
     </div>
 
-    <div id="dataTimestamps" style="display:none; font-size:0.75rem; color:#aaa; line-height:1.9; text-align:center;"></div>
-
     <div class="btn-row-csv">
       <button class="secondary" id="downloadBtn" onclick="descargar()" disabled>CSV Miembros</button>
       <button class="secondary" id="downloadDonationsBtn" onclick="descargarDonaciones()" disabled>CSV Donaciones</button>
@@ -375,6 +373,8 @@
     </div>
 
     <span id="status"></span>
+
+    <div id="dataTimestamps" style="display:none; font-size:0.75rem; color:#aaa; line-height:1.9; text-align:center;"></div>
   </div>
 
   <div id="warStatusBanner" style="display:none; width:100%; max-width:1100px; border-radius:10px; border:1px solid transparent; padding:0.6rem 1.25rem; flex-direction:column; gap:0.2rem; align-items:center; text-align:center;"></div>
@@ -618,7 +618,7 @@
 
       // Banner de fechas de actualización
       const fmtMX = ts => new Date(ts).toLocaleString('es-MX', {
-        timeZone: 'America/Mexico_City', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+        timeZone: 'America/Cancun', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
       });
       const stamps = [];
       if (currentWarJson?.snapshot_ts)       stamps.push(`📡 Última actualización de guerra: ${fmtMX(currentWarJson.snapshot_ts)}`);
