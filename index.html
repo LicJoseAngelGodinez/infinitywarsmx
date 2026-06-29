@@ -161,7 +161,10 @@
     /* leyenda */
     .legend {
       display: flex;
+      justify-content: flex-end;
       gap: 1.25rem;
+      width: 100%;
+      max-width: 1100px;
       font-size: 0.78rem;
       color: #aaa;
       flex-wrap: wrap;
@@ -373,8 +376,6 @@
     </div>
 
     <span id="status"></span>
-
-    <div id="dataTimestamps" style="display:none; font-size:0.75rem; color:#aaa; line-height:1.9; text-align:center;"></div>
   </div>
 
   <div id="warStatusBanner" style="display:none; width:100%; max-width:1100px; border-radius:10px; border:1px solid transparent; padding:0.6rem 1.25rem; flex-direction:column; gap:0.2rem; align-items:center; text-align:center;"></div>
@@ -409,7 +410,7 @@
         <p style="margin-top:0.4rem; line-height:1.5;">Top 5 miembros con más cartas donadas en la semana actual, ordenados de mayor a menor.</p>
       </details>
     </div>
-    <div class="diff-block" style="flex:1; min-width:260px;">
+    <div id="mvpParticipationWrapper" class="diff-block" style="flex:1; min-width:260px;">
       <div id="mvpParticipationHeader" class="diff-block-header stayed-header">⚔️ MVP — Participación</div>
       <table>
         <thead><tr>
@@ -439,16 +440,24 @@
 
   <div id="rosterHeader" class="diff-block-header stayed-header" style="display:none; width:100%; max-width:1100px; border-radius:10px; border:1px solid #0f3460;">📋 Roster del Clan</div>
 
-  <div class="legend">
+  <div id="tableWrapper">
+    <table>
+      <thead id="tableHead"></thead>
+
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <div id="legendWrapper" class="legend" style="display:none;">
     <div class="legend-item">
       <div class="legend-dot dot-inactive"></div>
       Inactivo más de 2 meses
     </div>
-    <div class="legend-item">
+    <div id="legendLowDonations" class="legend-item">
       <div class="legend-dot dot-low-donations"></div>
       <span id="lowDonationsLabel">Menos de 150 donaciones</span>
     </div>
-    <div class="legend-item">
+    <div id="legendMinInput" class="legend-item">
       <label for="minDonationsInput" style="display:flex; align-items:center; gap:0.4rem; color:#aaa;">
         Mínimo a remarcar:
         <input
@@ -461,13 +470,6 @@
         />
       </label>
     </div>
-  </div>
-
-  <div id="tableWrapper">
-    <table>
-      <thead id="tableHead"></thead>
-      <tbody id="tableBody"></tbody>
-    </table>
   </div>
 
   <details class="accordion" id="blacklistWrapper" style="display:none; width:100%; max-width:1100px;">
@@ -615,17 +617,6 @@
 
       loadMembers(members, currentWarJson);
       setStatus(`✓ ${members.length} miembros cargados.`, "success");
-
-      // Banner de fechas de actualización
-      const fmtMX = ts => new Date(ts).toLocaleString('es-MX', {
-        timeZone: 'America/Cancun', day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: false
-      });
-      const stamps = [];
-      if (currentWarJson?.snapshot_ts)       stamps.push(`📡 Última actualización de guerra: ${fmtMX(currentWarJson.snapshot_ts)}`);
-      if (membersJson.members_snapshot_ts)   stamps.push(`👥 Actualización de roster: ${fmtMX(membersJson.members_snapshot_ts)}`);
-      const stampsEl = document.getElementById('dataTimestamps');
-      stampsEl.innerHTML = stamps.join('<br>');
-      stampsEl.style.display = stamps.length ? 'block' : 'none';
 
       btn.disabled = false;
     }
@@ -801,8 +792,14 @@
 
     // ── Tabla principal ─────────────────────────────────────────────────
     function renderTable(members, currentWarJson) {
+      const isTraining   = currentWarJson?.periodType !== 'warDay';
       const twoMonthsAgo = new Date();
       twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
+
+      // Leyenda: mostrar solo items relevantes según el período
+      document.getElementById('legendWrapper').style.display = 'flex';
+      document.getElementById('legendLowDonations').style.display = isTraining ? 'none' : '';
+      document.getElementById('legendMinInput').style.display     = isTraining ? 'none' : '';
 
       const headers = ['Pos.','Nombre','Rol','Trofeos / Arena','Donaciones','Mazos Usados','Mazos Hoy','Barcos Atacados'];
 
@@ -812,7 +809,7 @@
       document.getElementById("tableBody").innerHTML = members.map(m => {
         const lastSeenDate = m.lastSeen ? parseClashDate(m.lastSeen) : new Date(0);
         const inactive     = lastSeenDate < twoMonthsAgo;
-        const lowDons      = m.donations < MIN_DONATIONS;
+        const lowDons      = !isTraining && m.donations < MIN_DONATIONS;
 
         const rowClass = inactive ? 'row-inactive' : (lowDons ? 'row-low-donations' : '');
 
@@ -858,13 +855,16 @@
         </tr>`;
       }).join('');
 
-      // Top 5: mazos DESC → fama DESC → donaciones DESC
+      // Participación: solo en días de batalla
       const participantsByTag = {};
       if (currentWarJson?.clan?.participants) {
         currentWarJson.clan.participants.forEach(p => { participantsByTag[p.tag] = p; });
       }
-      const totalWar  = Object.keys(participantsByTag).length;
+      const totalWar   = Object.keys(participantsByTag).length;
       const hasWarData = totalWar > 0;
+      const isTraining = currentWarJson?.periodType !== 'warDay';
+
+      document.getElementById('mvpParticipationWrapper').style.display = isTraining ? 'none' : '';
 
       if (!hasWarData) {
         document.getElementById('mvpParticipationHeader').textContent = '⚔️ MVP — Participación';
@@ -937,6 +937,7 @@
       document.getElementById("mvpWrapper").style.display = "none";
       document.getElementById("mvpFutureVetsWrapper").style.display = "none";
       document.getElementById("rosterHeader").style.display = "none";
+      document.getElementById("legendWrapper").style.display = "none";
       if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
     }
 
