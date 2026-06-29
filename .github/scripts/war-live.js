@@ -49,12 +49,13 @@ async function run() {
     donations_received: m.donationsReceived ?? 0,
     last_seen:          m.lastSeen          ?? null,
   }));
-  // Pausa Dom 22:30 UTC (5:30pm Cancún) → Lun 09:30 UTC para proteger el
-  // snapshot final de la semana antes del reset semanal de Clash (~23:00 UTC).
+  // Pausa Dom 23:00 UTC (18:00 Cancún) → Lun 09:30 UTC para proteger el
+  // snapshot final de la semana antes del reset semanal de Clash (~23:00–00:00 UTC).
+  // El último UPSERT válido es el de las 22:30 UTC (17:30 Cancún).
   const nowUTC = new Date();
   const day = nowUTC.getUTCDay();    // 0=Dom, 1=Lun
   const mins = nowUTC.getUTCHours() * 60 + nowUTC.getUTCMinutes();
-  const inBlackout = (day === 0 && mins >= 22 * 60 + 30) ||
+  const inBlackout = (day === 0 && mins >= 23 * 60) ||
                      (day === 1 && mins <   9 * 60 + 30);
 
   if (inBlackout) {
