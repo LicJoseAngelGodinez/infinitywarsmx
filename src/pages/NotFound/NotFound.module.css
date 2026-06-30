@@ -1,0 +1,38 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.code {
+  font-size: 6rem;
+  font-weight: 700;
+  color: #e94560;
+  line-height: 1;
+}
+
+.message {
+  font-size: 1.25rem;
+  color: #a0a0b0;
+}
+
+.link {
+  margin-top: 0.5rem;
+  color: #fffffe;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border: 1px solid #0f3460;
+  border-radius: 6px;
+  background: #0f3460;
+  transition: opacity 0.2s;
+}
+
+.link:hover {
+  opacity: 0.8;
+}

@@ -1,0 +1,16 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #0f0e17;
+  color: #fffffe;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
