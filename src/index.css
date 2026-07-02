@@ -7,6 +7,10 @@
 body {
   font-family: system-ui, -apple-system, sans-serif;
   background: #0f0e17;
+  background-image:
+    radial-gradient(ellipse at 50% -10%, rgba(15, 52, 96, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse at 85% 90%, rgba(233, 69, 96, 0.07) 0%, transparent 50%);
+  background-attachment: fixed;
   color: #fffffe;
   min-height: 100vh;
 }

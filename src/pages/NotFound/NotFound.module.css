@@ -1,38 +1,76 @@
 .container {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  gap: 1rem;
-  text-align: center;
   padding: 2rem;
+  /* Empuja el contenido ligeramente arriba del centro */
+  padding-bottom: 12vh;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+  max-width: 480px;
+}
+
+.logo {
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  object-fit: cover;
+  opacity: 0.85;
 }
 
 .code {
-  font-size: 6rem;
-  font-weight: 700;
-  color: #e94560;
+  font-size: 5rem;
+  font-weight: 800;
   line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fffffe;
+  margin-top: 0.25rem;
 }
 
 .message {
-  font-size: 1.25rem;
-  color: #a0a0b0;
+  font-size: .7rem;
+  color: #888;
+  line-height: 1.6;
 }
 
-.link {
+.buttons {
+  display: flex;
+  gap: 0.75rem;
   margin-top: 0.5rem;
-  color: #fffffe;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 0.5rem 1.25rem;
-  border: 1px solid #0f3460;
-  border-radius: 6px;
-  background: #0f3460;
-  transition: opacity 0.2s;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.link:hover {
-  opacity: 0.8;
+.btnPrimary,
+.btnSecondary {
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.btnPrimary {
+  background: #e94560;
+  color: #fff;
+}
+
+.btnSecondary {
+  background: transparent;
+  color: #fffffe;
+  border: 1px solid #333;
+}
+
+.btnPrimary:hover,
+.btnSecondary:hover {
+  opacity: 1;
 }

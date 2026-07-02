@@ -1,0 +1,70 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.slidingUp {
+  animation: slideUp 0.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Palpitación continua — patrón lub-dub */
+.pulsing {
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+/* Palpitación final remarcada — una sola vez */
+.bigPulsing {
+  animation: bigPulse 0.5s ease-in-out forwards;
+}
+
+.text {
+  color: #666;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: opacity 0.2s ease;
+}
+
+.textFade {
+  opacity: 0;
+}
+
+/* ── Keyframes ── */
+
+@keyframes pulse {
+  0%,  100% { transform: scale(1); }
+  15%        { transform: scale(1.07); }
+  30%        { transform: scale(1); }
+  45%        { transform: scale(1.04); }
+  70%        { transform: scale(1); }
+}
+
+@keyframes bigPulse {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+@keyframes slideUp {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-100%); }
+}
