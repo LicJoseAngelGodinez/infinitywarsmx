@@ -178,14 +178,14 @@
     }
 
     .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
       flex-shrink: 0;
     }
 
-    .dot-inactive      { background: rgba(255, 90, 90, 0.55); }
-    .dot-low-donations { background: rgba(255, 210, 0, 0.45); }
+    .dot-inactive      { background: #ff5a5a; box-shadow: 0 0 5px #ff5a5a88; }
+    .dot-low-donations { background: #ffd200; box-shadow: 0 0 5px #ffd20088; }
 
     /* Tabla principal */
     #tableWrapper {
@@ -287,6 +287,10 @@
     .diff-block tbody tr:last-child { border-bottom: none; }
     .diff-block tbody tr:hover { filter: brightness(1.2); }
     .diff-block tbody td { padding: 0.45rem 0.75rem; white-space: nowrap; }
+    .col-stat { width: 1%; text-align: center; }
+    .col-dot  { width: 1%; padding: 0 0 0 0.6rem; }
+    .col-name { padding: 1rem 1rem 1rem 0.3rem; }
+    .row-dot  { display: inline-block; width: 9px; height: 9px; border-radius: 50%; vertical-align: middle; }
 
     .diff-block tbody tr.row-new        { background: rgba(107, 255, 184, 0.08); }
     .diff-block tbody tr.row-left       { background: rgba(255, 90,  90,  0.10); }
@@ -388,7 +392,10 @@
       <div style="width:100%; overflow-x:auto; border-radius:10px; border:1px solid #0f3460;">
         <table>
           <thead><tr>
-            <th>Nombre</th><th>Rol</th><th>Fama</th><th>Mazos Usados</th><th>Mazos Hoy</th><th>🚢 Ataques</th>
+            <th class="col-dot"></th><th>Nombre</th><th>Rol</th><th>Fama</th>
+            <th class="col-stat" style="white-space:normal;">Mazos<br>Usados</th>
+            <th class="col-stat" style="white-space:normal;">Mazos<br>Hoy</th>
+            <th class="col-stat" style="white-space:normal;">🚢<br>Ataques</th>
           </tr></thead>
           <tbody id="currentWarBody"></tbody>
         </table>
@@ -401,7 +408,7 @@
       <div id="mvpDonationsHeader" class="diff-block-header stayed-header">🏆 MVP — Donaciones</div>
       <table>
         <thead><tr>
-          <th>#</th><th>Nombre</th><th>Donaciones</th>
+          <th>Nombre</th><th class="col-stat">Donaciones</th>
         </tr></thead>
         <tbody id="mvpDonationsBody"></tbody>
       </table>
@@ -414,7 +421,7 @@
       <div id="mvpParticipationHeader" class="diff-block-header stayed-header">⚔️ MVP — Participación</div>
       <table>
         <thead><tr>
-          <th>#</th><th>Nombre</th><th>Fama</th>
+          <th>Nombre</th><th class="col-stat">Fama</th>
         </tr></thead>
         <tbody id="mvpParticipationBody"></tbody>
       </table>
@@ -427,7 +434,7 @@
       <div id="mvpFutureVetsHeader" class="diff-block-header stayed-header">🌟 Futuros Veteranos!</div>
       <table>
         <thead><tr>
-          <th>#</th><th>Nombre</th><th>Fama</th>
+          <th>Nombre</th><th class="col-stat">Fama</th>
         </tr></thead>
         <tbody id="mvpFutureVetsBody"></tbody>
       </table>
@@ -455,20 +462,14 @@
     </div>
     <div id="legendLowDonations" class="legend-item">
       <div class="legend-dot dot-low-donations"></div>
-      <span id="lowDonationsLabel">Menos de 150 donaciones</span>
-    </div>
-    <div id="legendMinInput" class="legend-item">
-      <label for="minDonationsInput" style="display:flex; align-items:center; gap:0.4rem; color:#aaa;">
-        Mínimo a remarcar:
-        <input
+      <span id="lowDonationsLabel">Menos de <input
           type="number"
           id="minDonationsInput"
           value="150"
           min="0"
           oninput="updateMinDonations(this.value)"
-          style="width:70px; padding:0.25rem 0.4rem; border-radius:4px; border:1px solid #0f3460; background:#0d1b2a; color:#eee; font-size:0.78rem; outline:none;"
-        />
-      </label>
+          style="width:60px; padding:0.25rem 0.4rem; border-radius:4px; border:1px solid #0f3460; background:#0d1b2a; color:#eee; font-size:0.78rem; outline:none;"
+        /> donaciones</span>
     </div>
   </div>
 
@@ -478,7 +479,7 @@
       <div style="width:100%; overflow-x:auto; border-radius:10px; border:1px solid #0f3460;">
         <table>
           <thead><tr>
-            <th>Nombre</th><th>Rol</th><th>Trofeos</th><th>Donaciones</th><th>Fama</th><th>Mazos Usados</th>
+            <th class="col-dot"></th><th>Nombre</th><th>Rol</th><th>Trofeos</th><th>Donaciones</th><th>Fama</th><th>Mazos Usados</th>
           </tr></thead>
           <tbody id="blacklistBody"></tbody>
         </table>
@@ -627,7 +628,7 @@
         currentWarJson.clan.participants.forEach(p => { participantsByTag[p.tag] = p; });
       }
 
-      const roleClass = { elder: 'row-bl-elder', coLeader: 'row-bl-coleader' };
+      const roleDotColor = { elder: '#ffd200', coLeader: '#ff5a5a' };
 
       const worst20 = [...members]
         .map(m => {
@@ -638,14 +639,16 @@
         .slice(0, 20);
 
       document.getElementById('blacklistBody').innerHTML = worst20.map(m => {
-        const icon    = ROLE_ICON[m.role] ? ' ' + ROLE_ICON[m.role] : '';
-        const roleTxt = (ROLE_LABEL[m.role] || m.role) + icon;
-        const cls     = roleClass[m.role] || '';
-        return `<tr class="${cls}">
-          <td>${m.name}</td>
+        const icon      = ROLE_ICON[m.role] ? ' ' + ROLE_ICON[m.role] : '';
+        const roleTxt   = (ROLE_LABEL[m.role] || m.role) + icon;
+        const dotColor  = roleDotColor[m.role] || '';
+        const dotCell   = `<td class="col-dot">${dotColor ? `<span class="row-dot" style="background:${dotColor};box-shadow:0 0 5px ${dotColor}88"></span>` : ''}</td>`;
+        return `<tr>
+          ${dotCell}
+          <td class="col-name">${m.clanRank}. ${m.name}</td>
           <td>${roleTxt}</td>
           <td>${m.trophies.toLocaleString()}</td>
-          <td>${m.donations} ⬆️ — ${m.donationsReceived} ⬇️</td>
+          <td><span style="color:#6bffb8">${m.donations}</span> / <span style="color:${m.donationsReceived > m.donations ? '#ff8080' : '#f0c040'}">${m.donationsReceived}</span></td>
           <td>${m.fame}</td>
           <td>${m.decksUsed}</td>
         </tr>`;
@@ -655,14 +658,15 @@
     }
 
     function loadMembers(members, currentWarJson) {
-      currentMembers     = members;
-      currentData        = transformToExcelFormat(members);
+      const cleanMembers = members.filter(m => m.role != null);
+      currentMembers     = cleanMembers;
+      currentData        = transformToExcelFormat(cleanMembers);
       lastCurrentWarJson  = currentWarJson;
-      renderTable(members, currentWarJson);
-      renderMVPs(members, currentWarJson);
+      renderTable(cleanMembers, currentWarJson);
+      renderMVPs(cleanMembers, currentWarJson);
       renderWarStatusBanner(currentWarJson);
       renderCurrentWarClan(currentWarJson);
-      renderBlacklist(members, currentWarJson);
+      renderBlacklist(cleanMembers, currentWarJson);
       document.getElementById("downloadBtn").disabled = false;
       document.getElementById("downloadDonationsBtn").disabled = false;
       document.getElementById("downloadParticipationBtn").disabled = false;
@@ -672,7 +676,6 @@
     function updateMinDonations(value) {
       const parsed = parseInt(value, 10);
       MIN_DONATIONS = Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
-      document.getElementById('lowDonationsLabel').textContent = `Menos de ${MIN_DONATIONS} donaciones`;
 
       if (currentMembers.length) {
         renderTable(currentMembers, lastCurrentWarJson);
@@ -792,36 +795,36 @@
 
     // ── Tabla principal ─────────────────────────────────────────────────
     function renderTable(members, currentWarJson) {
-      const isTraining   = currentWarJson?.periodType !== 'warDay';
+      const isTraining   = !['warDay','colosseum'].includes(currentWarJson?.periodType);
       const twoMonthsAgo = new Date();
       twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
 
       // Leyenda: mostrar solo items relevantes según el período
       document.getElementById('legendWrapper').style.display = 'flex';
       document.getElementById('legendLowDonations').style.display = isTraining ? 'none' : '';
-      document.getElementById('legendMinInput').style.display     = isTraining ? 'none' : '';
 
-      const headers = ['Pos.','Nombre','Rol','Trofeos / Arena','Donaciones','Mazos Usados','Mazos Hoy','Barcos Atacados'];
+      const headers = ['Nombre','Rol','Trofeos / Arena','Donaciones','Mazos Usados','Mazos Hoy','Barcos Atacados'];
 
       document.getElementById("tableHead").innerHTML =
-        '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+        '<tr><th class="col-dot"></th>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
 
       document.getElementById("tableBody").innerHTML = members.map(m => {
         const lastSeenDate = m.lastSeen ? parseClashDate(m.lastSeen) : new Date(0);
         const inactive     = lastSeenDate < twoMonthsAgo;
         const lowDons      = !isTraining && m.donations < MIN_DONATIONS;
 
-        const rowClass = inactive ? 'row-inactive' : (lowDons ? 'row-low-donations' : '');
+        const dotColor = inactive ? '#ff5a5a' : (lowDons ? '#ffd200' : '');
+        const dotCell  = `<td class="col-dot">${dotColor ? `<span class="row-dot" style="background:${dotColor};box-shadow:0 0 5px ${dotColor}88"></span>` : ''}</td>`;
 
-        const icon    = ROLE_ICON[m.role] ? ROLE_ICON[m.role] + ' ' : '';
-        const roleTxt = (ROLE_LABEL[m.role] || m.role) + icon;
+        const icon    = ROLE_ICON[m.role] || '';
+        const roleTxt = (ROLE_LABEL[m.role] || m.role) + (icon ? ' ' + icon : '');
 
-        return `<tr class="${rowClass}">
-          <td>${m.clanRank}</td>
-          <td>${m.name}</td>
+        return `<tr>
+          ${dotCell}
+          <td class="col-name">${m.clanRank}. ${m.name}</td>
           <td>${roleTxt}</td>
-          <td>${m.trophies.toLocaleString()} — ${m.arena?.name ?? '—'}</td>
-          <td>${m.donations} ⬆️ — ${m.donationsReceived} ⬇️</td>
+          <td>${m.trophies.toLocaleString()} / ${m.arena?.name ?? '—'}</td>
+          <td><span style="color:#6bffb8">${m.donations}</span> / <span style="color:${m.donationsReceived > m.donations ? '#ff8080' : '#f0c040'}">${m.donationsReceived}</span></td>
           <td>${m.decksUsed}</td>
           <td>${m.decksUsedToday}</td>
           <td>${m.boatAttacks} 🚢</td>
@@ -849,9 +852,8 @@
       document.getElementById('mvpDonationsBody').innerHTML = topDonators.map((m, i) => {
         const icon = ROLE_ICON[m.role] || '';
         return `<tr>
-          <td>${i + 1}</td>
-          <td>${m.name}${icon ? ' ' + icon : ''}</td>
-          <td>${m.donations} ⬆️</td>
+          <td>${i + 1}. ${m.name}${icon ? ' ' + icon : ''}</td>
+          <td class="col-stat">${m.donations}</td>
         </tr>`;
       }).join('');
 
@@ -862,7 +864,7 @@
       }
       const totalWar   = Object.keys(participantsByTag).length;
       const hasWarData = totalWar > 0;
-      const isTraining = currentWarJson?.periodType !== 'warDay';
+      const isTraining = !['warDay','colosseum'].includes(currentWarJson?.periodType);
 
       document.getElementById('mvpParticipationWrapper').style.display = isTraining ? 'none' : '';
 
@@ -886,16 +888,15 @@
         document.getElementById('mvpParticipationBody').innerHTML = topParticipants.map((m, i) => {
           const icon = ROLE_ICON[m.role] || '';
           return `<tr>
-            <td>${i + 1}</td>
-            <td>${m.name}${icon ? ' ' + icon : ''}</td>
-            <td>${m.fame}</td>
+            <td>${i + 1}. ${m.name}${icon ? ' ' + icon : ''}</td>
+            <td class="col-stat">${m.fame}</td>
           </tr>`;
         }).join('');
       }
 
       // Futuros Veteranos: role 'member', cumple donaciones y ≥75% de mazos si es día de batalla
       const { periodDay: warPeriodDay } = getWarDayInfo();
-      const isWarDay      = currentWarJson?.periodType === 'warDay';
+      const isWarDay      = ['warDay','colosseum'].includes(currentWarJson?.periodType);
       const deckThreshold = isWarDay ? Math.ceil(warPeriodDay * 4 * 0.75) : 0;
       const memberPlayers = members.filter(m => {
         if (m.role !== 'member' || m.donations < MIN_DONATIONS) return false;
@@ -917,9 +918,8 @@
 
         document.getElementById('mvpFutureVetsBody').innerHTML = topFutureVets.map((m, i) => {
           return `<tr>
-            <td>${i + 1}</td>
-            <td>${m.name}</td>
-            <td>${m.fame}</td>
+            <td>${i + 1}. ${m.name}</td>
+            <td class="col-stat">${m.fame}</td>
           </tr>`;
         }).join('');
       }
@@ -1172,9 +1172,17 @@
       const sectionIndex = currentWarJson.sectionIndex ?? 0;
       const week         = sectionIndex + 1;
       const { periodDay } = getWarDayInfo();
-      const isWar = periodType === 'warDay';
+      const isColosseum = periodType === 'colosseum';
+      const isWar       = periodType === 'warDay' || isColosseum;
+      el.style.boxShadow = '';
 
-      if (isWar) {
+      if (isColosseum) {
+        el.style.background  = 'rgba(20, 14, 2, 0.85)';
+        el.style.borderColor = 'rgba(240, 192, 64, 0.65)';
+        el.style.color       = '#f0c040';
+        el.style.boxShadow   = '0 0 22px rgba(240,192,64,0.22), inset 0 0 40px rgba(200,140,0,0.06)';
+        el.innerHTML = `<div style="font-size:1.05rem;font-weight:700;letter-spacing:1.5px;text-shadow:0 0 14px rgba(240,192,64,0.55);">✦ SEMANA FINAL · COLISEO ABIERTO ✦</div><div style="font-size:0.8rem;color:rgba(240,192,64,0.7);margin-top:0.2rem;letter-spacing:0.5px;">⚔️ DÍA DE BATALLA ${periodDay}</div><div id="warCountdown" style="font-size:0.78rem;color:rgba(240,192,64,0.5);margin-top:0.15rem;"></div>`;
+      } else if (isWar) {
         el.style.background  = 'rgba(255, 90, 90, 0.13)';
         el.style.borderColor = 'rgba(255, 90, 90, 0.35)';
         el.style.color       = '#ff8080';
@@ -1212,23 +1220,30 @@
       banner.textContent = `👥 ${playing}/${total} miembros participando (${percentage}%)`;
 
       const roleByTag = {};
-      currentMembers.forEach(m => { roleByTag[m.tag] = m.role; });
+      const rankByTag = {};
+      currentMembers.forEach(m => { roleByTag[m.tag] = m.role; rankByTag[m.tag] = m.clanRank; });
 
-      const sorted = [...c.participants].sort((a, b) => b.fame - a.fame);
+      const sorted = [...c.participants]
+        .filter(p => roleByTag[p.tag] != null)
+        .sort((a, b) => b.fame - a.fame);
 
       body.innerHTML = sorted.map(p => {
-        const rowClass    = p.decksUsed === 0 ? 'row-inactive' : '';
+        const inactive    = p.decksUsed === 0;
+        const dotColor    = inactive ? '#ff5a5a' : '';
+        const dotCell     = `<td class="col-dot">${dotColor ? `<span class="row-dot" style="background:${dotColor};box-shadow:0 0 5px ${dotColor}88"></span>` : ''}</td>`;
         const role        = roleByTag[p.tag];
         const roleLabel   = role ? (ROLE_LABEL[role] || '') : '';
         const roleIcon    = role ? (ROLE_ICON[role]  || '') : '';
         const roleDisplay = roleIcon ? `${roleLabel} ${roleIcon}` : roleLabel;
-        return `<tr class="${rowClass}">
-          <td>${p.name}</td>
+        const rank        = rankByTag[p.tag] ? `${rankByTag[p.tag]}. ` : '';
+        return `<tr>
+          ${dotCell}
+          <td class="col-name">${rank}${p.name}</td>
           <td>${roleDisplay}</td>
           <td>${p.fame}</td>
-          <td>${p.decksUsed}</td>
-          <td>${p.decksUsedToday}</td>
-          <td>${p.boatAttacks}</td>
+          <td class="col-stat">${p.decksUsed}</td>
+          <td class="col-stat">${p.decksUsedToday}</td>
+          <td class="col-stat">${p.boatAttacks}</td>
         </tr>`;
       }).join('');
     }
