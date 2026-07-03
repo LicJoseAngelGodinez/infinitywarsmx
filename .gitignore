@@ -30,3 +30,6 @@ register/
 # Node (por si se agrega en el futuro)
 node_modules/
 dist/
+
+# Supabase CLI (caché local, project-ref y versiones)
+supabase/.temp/

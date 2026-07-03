@@ -1,9 +1,10 @@
 name: war-live
 
 on:
-  schedule:
-    - cron: '*/30 * * * *'  # Cada 30 minutos
-  workflow_dispatch:                               # Disparo manual para pruebas
+  # Migrado a Supabase Cron (supabase/cron.sql) — ver war-live Edge Function.
+  # schedule:
+  #   - cron: '*/30 * * * *'  # Cada 30 minutos
+  workflow_dispatch:                               # Disparo manual de respaldo
 
 jobs:
   snapshot:
