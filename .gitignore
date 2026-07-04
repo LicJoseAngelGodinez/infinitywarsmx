@@ -32,3 +32,6 @@ register/
 node_modules/
 dist/
 *.tsbuildinfo
+
+# Supabase CLI (caché local, project-ref y versiones)
+supabase/.temp/

@@ -1,9 +1,10 @@
 name: members-daily
 
 on:
-  schedule:
-    - cron: '0 9 * * *'   # Diario a las 9:00 UTC (antes del corte de 9:45)
-  workflow_dispatch:        # Disparo manual para pruebas
+  # Migrado a Supabase Cron (supabase/cron_members_daily.sql) — ver members-daily Edge Function.
+  # schedule:
+  #   - cron: '0 9 * * *'   # Diario a las 9:00 UTC (antes del corte de 9:45)
+  workflow_dispatch:        # Disparo manual de respaldo
 
 jobs:
   snapshot:
