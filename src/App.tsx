@@ -2,7 +2,12 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ClanDataProvider, useClanData } from '@/context/ClanDataContext'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
 import { Navbar } from '@/components/Navbar'
+import { Footer } from '@/components/Footer'
 import { Dashboard } from '@/pages/Dashboard'
+import { Guerra } from '@/pages/Guerra'
+import { Reglas } from '@/pages/Reglas'
+import { Registro } from '@/pages/Registro'
+import { Login } from '@/pages/Login'
 import { NotFound } from '@/pages/NotFound'
 
 function AppContent() {
@@ -13,8 +18,13 @@ function AppContent() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/guerra" element={<Guerra />} />
+        <Route path="/reglas" element={<Reglas />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/login" element={<Login />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <Footer />
     </>
   )
 }

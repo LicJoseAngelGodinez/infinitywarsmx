@@ -8,7 +8,7 @@ const NAV_ITEMS = [
   { label: 'Clan',     to: '/'         },
   { label: 'Guerra',   to: '/guerra'   },
   { label: 'Reglas',   to: '/reglas'   },
-  { label: 'Registro', to: '/registro' },
+  { label: 'Rankings', to: '/rankings' },
 ]
 
 function navLinkClass({ isActive }: { isActive: boolean }) {
@@ -16,17 +16,16 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
 }
 
 export function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const { isMobile, isTablet } = useBreakpoint()
-  const showHamburger = isMobile || isTablet
+  const [isOpen, setIsOpen] = useState(false);
+  const { isMobile } = useBreakpoint();
 
-  const close = () => setIsOpen(false)
+  const close = () => setIsOpen(false);
 
   return (
     <>
-      <header className={`${styles.header}${isMobile || isTablet ? ` ${styles.headerColapsed}` : ''}
+      <header className={`${styles.header}${isMobile ? ` ${styles.headerColapsed}` : ''}
       }`}>
-        {showHamburger && (
+        {isMobile && (
           <button
             className={styles.hamburger}
             onClick={() => setIsOpen(true)}
@@ -37,7 +36,7 @@ export function Navbar() {
         )}
         <Link to="/" className={styles.brand}><img src={logo} alt="Infinity Wars MX" className={styles.logo} /></Link>
 
-        {!showHamburger && (
+        {!isMobile && (
           <nav className={styles.desktopNav}>
             {NAV_ITEMS.map(item => (
               <NavLink key={item.to} to={item.to} className={navLinkClass} end>
@@ -63,24 +62,6 @@ export function Navbar() {
             <Link to="/login" className={styles.mobileLoginBtn} onClick={close}>Login</Link>
           </nav>
         </div>
-      )}
-
-      {/* Tablet — sidebar 1/3 ancho */}
-      {isTablet && isOpen && (
-        <>
-          <div className={styles.backdrop} onClick={close} />
-          <div className={styles.sidebar}>
-            <button className={styles.closeBtn} onClick={close} aria-label="Cerrar menú">✕</button>
-            <nav className={styles.sidebarNav}>
-              {NAV_ITEMS.map(item => (
-                <Link key={item.to} to={item.to} className={styles.sidebarLink} onClick={close}>
-                  {item.label}
-                </Link>
-              ))}
-              <Link to="/login" className={styles.sidebarLoginBtn} onClick={close}>Login</Link>
-            </nav>
-          </div>
-        </>
       )}
     </>
   )

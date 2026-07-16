@@ -1,0 +1,51 @@
+.banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 1rem auto 0;
+  padding: 1rem 1.5rem;
+  width: fit-content;
+  max-width: calc(100vw - 2rem);
+  text-align: center;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.summary,
+.participation {
+  font-size: 0.85rem;
+  color: #ccc;
+}
+
+.countdown {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.training {
+  background: rgba(107, 255, 184, 0.08);
+  border-color: rgba(107, 255, 184, 0.25);
+  color: #6bffb8;
+}
+
+.war {
+  background: rgba(255, 90, 90, 0.13);
+  border-color: rgba(255, 90, 90, 0.35);
+  color: #ff8080;
+}
+
+.colosseum {
+  background: rgba(20, 14, 2, 0.85);
+  border-color: rgba(240, 192, 64, 0.65);
+  color: #f0c040;
+  box-shadow: 0 0 22px rgba(240, 192, 64, 0.22), inset 0 0 40px rgba(200, 140, 0, 0.06);
+}

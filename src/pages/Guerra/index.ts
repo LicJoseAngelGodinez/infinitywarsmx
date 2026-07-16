@@ -1,0 +1,1 @@
+export { Guerra } from './Guerra'

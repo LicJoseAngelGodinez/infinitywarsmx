@@ -1,5 +1,5 @@
 export type Role = 'leader' | 'coLeader' | 'elder' | 'member';
-export type PeriodType = 'training' | 'warDay';
+export type PeriodType = 'training' | 'warDay' | 'colosseum';
 
 export interface Member {
   tag: string;

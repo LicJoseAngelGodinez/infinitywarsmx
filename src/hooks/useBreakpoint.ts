@@ -31,8 +31,8 @@ export function useBreakpoint() {
 
   return {
     breakpoint: bp,
-    isMobile:  bp === 'xsm' || bp === 'sm',
-    isTablet:  bp === 'md',
+    isMobile:  bp === 'xsm',
+    isTablet:  bp === 'sm' || bp === 'md',
     isDesktop: bp === 'lg' || bp === 'xlg' || bp === 'xxlg',
   }
 }

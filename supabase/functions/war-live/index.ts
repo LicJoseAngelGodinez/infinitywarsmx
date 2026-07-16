@@ -89,6 +89,20 @@ Deno.serve(async (_req) => {
       snapshot_ts:      now,
     }));
 
+    // Borra participantes de guerras pasadas que ya no están en el roster
+    // actual — si no, war_live acumula filas fantasma para siempre (UPSERT
+    // nunca las elimina, solo agrega/actualiza las que sí vienen en la
+    // respuesta de hoy).
+    const currentTags = participants.map((p: any) => p.tag);
+    if (currentTags.length > 0) {
+      const tagList = currentTags.map((t: string) => encodeURIComponent(t)).join(',');
+      const delRes = await fetch(`${SUPABASE}/rest/v1/war_live?tag=not.in.(${tagList})`, {
+        method: 'DELETE',
+        headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` },
+      });
+      if (!delRes.ok) throw new Error(`Supabase war_live delete stale → ${delRes.status}: ${await delRes.text()}`);
+    }
+
     await supabaseUpsert('war_live', rows);
 
     // 4. Actualizar metadatos del clan en app_settings
