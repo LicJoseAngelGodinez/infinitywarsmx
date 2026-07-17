@@ -8,6 +8,7 @@ export interface MvpEntry {
   tag: string;
   name: string;
   role: Member['role'];
+  clanRank: number;
   value: number;
 }
 
@@ -27,7 +28,7 @@ export function getTopDonators(members: Member[], limit = 5): MvpEntry[] {
   return [...members]
     .sort((a, b) => b.donations - a.donations)
     .slice(0, limit)
-    .map(m => ({ tag: m.tag, name: m.name, role: m.role, value: m.donations }));
+    .map(m => ({ tag: m.tag, name: m.name, role: m.role, clanRank: m.clanRank, value: m.donations }));
 }
 
 export function getWarParticipationPct(participants: WarParticipant[]): number {
@@ -45,7 +46,7 @@ export function getTopWarParticipants(members: Member[], participants: WarPartic
     })
     .sort((a, b) => b.decksUsed - a.decksUsed || b.fame - a.fame || b.donations - a.donations)
     .slice(0, limit)
-    .map(m => ({ tag: m.tag, name: m.name, role: m.role, value: m.fame }));
+    .map(m => ({ tag: m.tag, name: m.name, role: m.role, clanRank: m.clanRank, value: m.fame }));
 }
 
 // Candidatos a Veteranía: role 'member', cumple donaciones y, si es día de
@@ -68,5 +69,5 @@ export function getVeteranCandidates(members: Member[], participants: WarPartici
     })
     .sort((a, b) => b.decksUsed - a.decksUsed || b.fame - a.fame || b.donations - a.donations)
     .slice(0, limit)
-    .map(m => ({ tag: m.tag, name: m.name, role: m.role, value: m.fame }));
+    .map(m => ({ tag: m.tag, name: m.name, role: m.role, clanRank: m.clanRank, value: m.fame }));
 }

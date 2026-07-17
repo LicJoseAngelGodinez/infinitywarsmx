@@ -1,40 +1,10 @@
 import { useClanData } from '@/context/ClanDataContext'
-import { ROLE_ICON } from '@/utils/roles'
-import {
-  getDonationsPct,
-  getTopDonators,
-  getWarParticipationPct,
-  getTopWarParticipants,
-  getVeteranCandidates,
-  type MvpEntry,
-} from '@/utils/mvp'
+import { getTopDonators, getTopWarParticipants, getVeteranCandidates } from '@/utils/mvp'
 import styles from './MvpCards.module.css'
-
-interface CardProps {
-  title: string
-  entries: MvpEntry[]
-  emptyLabel: string
-}
-
-function Card({ title, entries, emptyLabel }: CardProps) {
-  return (
-    <div className={styles.card}>
-      <h3 className={styles.cardTitle}>{title}</h3>
-      {entries.length === 0 ? (
-        <p className={styles.empty}>{emptyLabel}</p>
-      ) : (
-        <ol className={styles.list}>
-          {entries.map((entry, i) => (
-            <li key={entry.tag} className={styles.item}>
-              <span className={styles.rank}>{i + 1}. {entry.name} {ROLE_ICON[entry.role]}</span>
-              <span className={styles.value}>{entry.value.toLocaleString()}</span>
-            </li>
-          ))}
-        </ol>
-      )}
-    </div>
-  )
-}
+import donationsImg from '@/assets/donations.webp'
+import participationImg from '@/assets/participation.webp'
+import eldersImg from '@/assets/elders.webp'
+import noEldersImg from '@/assets/noelders.webp'
 
 export function MvpCards() {
   const { members, warLive } = useClanData()
@@ -44,34 +14,74 @@ export function MvpCards() {
   const participants = warLive?.clan.participants ?? []
   const isWarDay = warLive?.periodType === 'warDay' || warLive?.periodType === 'colosseum'
 
-  const donationsPct    = getDonationsPct(members)
-  const topDonators     = getTopDonators(members)
-  const participationPct = getWarParticipationPct(participants)
-  const topParticipants = getTopWarParticipants(members, participants)
-  const veteranCandidates = getVeteranCandidates(members, participants, isWarDay)
+  const [topDonator] = getTopDonators(members, 1)
+  const [topParticipant] = getTopWarParticipants(members, participants, 1)
+  const [topCandidate] = getVeteranCandidates(members, participants, isWarDay, 1)
 
   return (
     <section className={styles.grid}>
-      <Card
-        title={`🏆 MVP — Donaciones ${donationsPct}%`}
-        entries={topDonators}
-        emptyLabel="— sin datos —"
-      />
+      <div className={styles.card}>
+        <div>
+          <p className={styles.category}>MVP</p>
+          <p className={styles.category}>Donaciones</p>
+        </div>
+        <div className={styles.imageWrap}>
+          <img src={donationsImg} alt="Donaciones" className={styles.cardImage} />
+        </div>
+        <div>
+          <p className={styles.name}>{topDonator.name}</p>
+          <p className={styles.rank}>Posición #{topDonator.clanRank}</p>
+          <p className={styles.score}>{topDonator.value.toLocaleString()} donaciones</p>
+        </div>
+      </div>
 
       {isWarDay && (
-        <Card
-          title={`⚔️ MVP — Guerra ${participationPct}%`}
-          entries={topParticipants}
-          emptyLabel="— sin datos de guerra —"
-        />
+        <div className={styles.card}>
+          <div>
+            <p className={styles.category}>MVP</p>
+            <p className={styles.category}>Guerra</p>
+          </div>
+          <div className={styles.imageWrap}>
+            <img src={participationImg} alt="Participación en guerra" className={styles.cardImage} />
+          </div>
+          <div>
+            <p className={styles.name}>{topParticipant.name}</p>
+            <p className={styles.rank}>Posición #{topParticipant.clanRank}</p>
+            <p className={styles.score}>{topParticipant.value.toLocaleString()} fama</p>
+
+          </div>
+        </div>
       )}
 
-      {veteranCandidates.length > 0 && (
-        <Card
-          title="🌟 Candidatos a Veteranía"
-          entries={veteranCandidates}
-          emptyLabel=""
-        />
+      {topCandidate ? (
+        <div className={styles.card}>
+          <div>
+            <p className={styles.category}>Veteranos</p>
+            <br />
+          </div>
+          <div className={styles.imageWrap}>
+            <img src={eldersImg} alt="Candidato a veteranía" className={styles.cardImage} />
+          </div>
+          <div>
+            <p className={styles.name}>{topCandidate.name}</p>
+            <p className={styles.rank}>Posición #{topCandidate.clanRank}</p>
+            <p className={styles.score}>Candidato</p>
+
+          </div>
+        </div>
+      ) : (
+        <div className={styles.card}>
+          <p className={styles.category}>Veteranos</p>
+          <div className={styles.imageWrap}>
+            <img src={noEldersImg} alt="Sin candidatos a veteranía" className={styles.cardImage} />
+          </div>
+          <div>
+            <p className={styles.name}>Sin candidatos</p>
+            <p className={styles.explanation}>
+              Ningún miembro cumple todavía el umbral de donaciones{isWarDay ? ' y de mazos usados en la guerra' : ''} necesario para ser candidato a veteranía.
+            </p>
+          </div>
+        </div>
       )}
     </section>
   )
