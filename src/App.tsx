@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ClanDataProvider, useClanData } from '@/context/ClanDataContext'
+import { AuthProvider } from '@/context/AuthContext'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
@@ -8,7 +9,7 @@ import { Guerra } from '@/pages/Guerra'
 import { Reglas } from '@/pages/Reglas'
 import { Registro } from '@/pages/Registro'
 import { Rankings } from '@/pages/Rankings'
-import { Login } from '@/pages/Login'
+import { AdminDashboard } from '@/pages/AdminDashboard'
 import { NotFound } from '@/pages/NotFound'
 
 function AppContent() {
@@ -23,7 +24,7 @@ function AppContent() {
         <Route path="/reglas" element={<Reglas />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/rankings" element={<Rankings />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <Footer />
@@ -34,9 +35,11 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <ClanDataProvider>
-        <AppContent />
-      </ClanDataProvider>
+      <AuthProvider>
+        <ClanDataProvider>
+          <AppContent />
+        </ClanDataProvider>
+      </AuthProvider>
     </BrowserRouter>
   )
 }

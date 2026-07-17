@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import { useAuth } from '@/context/AuthContext'
+import { LoginModal } from '@/components/LoginModal'
 import styles from './Navbar.module.css'
 import logo from '@/assets/logo.jpeg'
 
@@ -17,9 +19,17 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
   const { isMobile } = useBreakpoint();
+  const { session, signOut } = useAuth();
 
   const close = () => setIsOpen(false);
+
+  const authAction = session
+    ? () => signOut()
+    : () => setIsLoginOpen(true)
+
+  const authLabel = session ? 'Cerrar sesión' : 'Login'
 
   return (
     <>
@@ -43,7 +53,12 @@ export function Navbar() {
                 {item.label}
               </NavLink>
             ))}
-            <Link to="/login" className={styles.loginBtn}>Login</Link>
+            {session && (
+              <NavLink to="/dashboard" className={navLinkClass} end>
+                Dashboard
+              </NavLink>
+            )}
+            <button onClick={authAction} className={styles.loginBtn}>{authLabel}</button>
           </nav>
         )}
 
@@ -59,10 +74,17 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
-            <Link to="/login" className={styles.mobileLoginBtn} onClick={close}>Login</Link>
+            {session && (
+              <Link to="/dashboard" className={styles.mobileLink} onClick={close}>
+                Dashboard
+              </Link>
+            )}
+            <button onClick={() => { close(); authAction(); }} className={styles.mobileLoginBtn}>{authLabel}</button>
           </nav>
         </div>
       )}
+
+      <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
     </>
   )
 }

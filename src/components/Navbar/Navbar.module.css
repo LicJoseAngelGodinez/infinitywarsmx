@@ -66,13 +66,16 @@
 
 .loginBtn {
   margin-left: 0.5rem;
-  padding: 0.4rem 1.1rem;
+  padding: 0.3rem 0.8rem;
   background: #e94560;
   color: #fff;
+  border: none;
   text-decoration: none;
   border-radius: 20px;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
   transition: opacity 0.15s;
 }
 
@@ -161,11 +164,14 @@
   padding: 0.4rem 1.1rem;
   background: #e94560;
   color: #fff;
+  border: none;
   text-decoration: none;
   border-radius: 8px;
   font-size: 0.5rem;
   font-weight: 700;
+  font-family: inherit;
   align-self: flex-start;
+  cursor: pointer;
   transition: opacity 0.15s;
 }
 
