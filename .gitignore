@@ -25,11 +25,13 @@ currentriverrace.json
 riverracelog.json
 members.json
 old_index.html
+legacy.html
 register/
 
-# Node (por si se agrega en el futuro)
+# Node
 node_modules/
 dist/
+*.tsbuildinfo
 
 # Supabase CLI (caché local, project-ref y versiones)
 supabase/.temp/

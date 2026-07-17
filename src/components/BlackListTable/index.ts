@@ -1,0 +1,1 @@
+export { BlackListTable } from './BlackListTable'

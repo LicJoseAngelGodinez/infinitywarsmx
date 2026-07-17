@@ -1,0 +1,1 @@
+export { Reglas } from './Reglas'
