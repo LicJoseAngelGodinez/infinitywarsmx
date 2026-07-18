@@ -122,7 +122,7 @@ function WeekOverviewCard({ phase, sectionIndex, playing, total, percentage, cla
 }
 
 export function WarStatusBanner() {
-  const { warLive } = useClanData()
+  const { warLive, members } = useClanData()
   const countdown = useWarCountdown()
 
   const phase: Phase = warLive
@@ -137,8 +137,14 @@ export function WarStatusBanner() {
 
   const { sectionIndex, clan } = warLive
 
-  const total = clan.participants.length
-  const playing = clan.participants.filter(p => p.decksUsed > 0).length
+  // Participantes que ya no son miembros actuales del clan (salieron a
+  // media semana, su participación quedó "congelada" en war_live) no
+  // deben contar para el total — el denominador es el roster actual.
+  const memberTags = new Set(members.map(m => m.tag))
+  const currentParticipants = clan.participants.filter(p => memberTags.has(p.tag))
+
+  const total = members.length
+  const playing = currentParticipants.filter(p => p.decksUsed > 0).length
   const percentage = total ? Math.round((playing / total) * 100) : 0
 
   // clan.fame de la API llega en 0 fuera de días de batalla — se calcula

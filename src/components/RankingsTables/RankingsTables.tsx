@@ -46,7 +46,7 @@ export function RankingsTables() {
 
   const donationsPct    = getDonationsPct(members)
   const topDonators     = getTopDonators(members)
-  const participationPct = getWarParticipationPct(participants)
+  const participationPct = getWarParticipationPct(members, participants)
   const topParticipants = getTopWarParticipants(members, participants)
   const veteranCandidates = getVeteranCandidates(members, participants, isWarDay)
 
