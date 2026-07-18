@@ -3,11 +3,15 @@ import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
-  base: '/gaming/',
   plugins: [react()],
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),
+    },
+  },
+  server: {
+    proxy: {
+      '/api': 'https://infinitywarsmx.vercel.app',
     },
   },
 })

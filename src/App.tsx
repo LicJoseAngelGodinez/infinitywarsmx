@@ -34,7 +34,7 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+    <BrowserRouter>
       <AuthProvider>
         <ClanDataProvider>
           <AppContent />

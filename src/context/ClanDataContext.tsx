@@ -12,19 +12,15 @@ interface ClanDataContextValue {
 
 const ClanDataContext = createContext<ClanDataContextValue | null>(null)
 
-// URL absoluta: cuando el sitio se sirve vía rewrite (ej. mipagina.com/gaming),
-// fetch() con ruta relativa resuelve contra ese origen, no contra Vercel.
-const API_BASE = 'https://infinitywarsmx.vercel.app'
-
 export function ClanDataProvider({ children }: { children: ReactNode }) {
   const membersQuery = useQuery<MembersResponse>({
     queryKey: ['members'],
-    queryFn: () => fetch(`${API_BASE}/api/members`).then(r => r.json()),
+    queryFn: () => fetch('/api/members').then(r => r.json()),
   })
 
   const warQuery = useQuery<WarLiveResponse>({
     queryKey: ['war-live'],
-    queryFn: () => fetch(`${API_BASE}/api/war-live`).then(r => r.json()),
+    queryFn: () => fetch('/api/war-live').then(r => r.json()),
   })
 
   return (
