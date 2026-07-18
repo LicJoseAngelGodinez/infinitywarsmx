@@ -3,3 +3,22 @@
   margin: 0 auto;
   padding: 2rem 1rem;
 }
+
+.whatsappBtn {
+  display: block;
+  margin: 0 auto 2rem;
+  padding: 0.75rem 1.5rem;
+  background: #25D366;
+  color: #08341c;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.whatsappBtn:hover {
+  opacity: 0.85;
+}

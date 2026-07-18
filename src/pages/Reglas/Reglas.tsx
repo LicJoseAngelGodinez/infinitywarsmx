@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { WhatsAppJoinModal } from '@/components/WhatsAppJoinModal'
 import styles from './Reglas.module.css'
 
 const RULES = [
@@ -44,18 +42,12 @@ const COLIDERATO_RESPONSIBILITIES = [
 ]
 
 export function Reglas() {
-  const [isWhatsAppOpen, setIsWhatsAppOpen] = useState(false)
-
   return (
     <main className={styles.container}>
       <h1 className={styles.title}>Reglas del Clan</h1>
       <p className={styles.description}>
         Reglas de Infinity Wars MX — léelas con calma, aplican para todos los miembros.
       </p>
-
-      <button className={styles.whatsappBtn} onClick={() => setIsWhatsAppOpen(true)}>
-        💬 Únete a la comunidad de WhatsApp
-      </button>
 
       <div className={styles.sections}>
         {RULES.map(section => (
@@ -84,8 +76,6 @@ export function Reglas() {
           </p>
         </section>
       </div>
-
-      <WhatsAppJoinModal isOpen={isWhatsAppOpen} onClose={() => setIsWhatsAppOpen(false)} />
     </main>
   )
 }
