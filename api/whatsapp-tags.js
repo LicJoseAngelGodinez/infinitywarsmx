@@ -18,6 +18,10 @@ export default async (req, res) => {
     });
     const rows = await tagsRes.json();
 
+    if (!tagsRes.ok) {
+      throw new Error(`Supabase whatsapp_registrations → ${tagsRes.status}: ${JSON.stringify(rows)}`);
+    }
+
     res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=30');
     res.status(200).json({ tags: rows.map(r => r.tag) });
   } catch (err) {
