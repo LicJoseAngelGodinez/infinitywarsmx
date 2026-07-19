@@ -32,6 +32,19 @@ export function WhatsAppJoinModal({ isOpen, onClose }: WhatsAppJoinModalProps) {
     enabled: isOpen,
   })
 
+  // Solo tags -- este endpoint nunca expone teléfonos ni nombres.
+  const registeredTagsQuery = useQuery({
+    queryKey: ['whatsapp-tags'],
+    queryFn: async () => {
+      const res = await fetch('/api/whatsapp-tags')
+      const data: { tags: string[] } = await res.json()
+      return new Set(data.tags)
+    },
+    enabled: isOpen,
+  })
+
+  const availableMembers = members.filter(m => !registeredTagsQuery.data?.has(m.tag))
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError(null)
@@ -76,7 +89,7 @@ export function WhatsAppJoinModal({ isOpen, onClose }: WhatsAppJoinModalProps) {
             className={styles.input}
           >
             <option value="" disabled>Selecciona tu nombre</option>
-            {members.map(m => (
+            {availableMembers.map(m => (
               <option key={m.tag} value={m.tag}>{m.name}</option>
             ))}
           </select>

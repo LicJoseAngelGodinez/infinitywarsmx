@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { ClanDataProvider, useClanData } from '@/context/ClanDataContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { LoadingOverlay } from '@/components/LoadingOverlay'
+import { ScrollToTop } from '@/components/ScrollToTop'
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Dashboard } from '@/pages/Dashboard'
@@ -16,6 +17,7 @@ function AppContent() {
   const { isLoading } = useClanData()
   return (
     <>
+      <ScrollToTop />
       <LoadingOverlay isLoaded={!isLoading} />
       <Navbar />
       <Routes>
