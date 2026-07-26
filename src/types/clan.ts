@@ -77,5 +77,5 @@ export interface PlayerDetail {
   warDayWins: number;
   currentDeck: PlayerCard[];
   currentDeckSupportCards: PlayerCard[];
-  currentFavouriteCard: PlayerFavouriteCard;
+  currentFavouriteCard: PlayerFavouriteCard | null;
 }

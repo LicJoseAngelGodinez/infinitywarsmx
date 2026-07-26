@@ -66,6 +66,12 @@
   color: #fffffe;
 }
 
+.phrasePlaceholder {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: #999;
+}
+
 .divider {
   margin: 1rem 0;
   border: none;

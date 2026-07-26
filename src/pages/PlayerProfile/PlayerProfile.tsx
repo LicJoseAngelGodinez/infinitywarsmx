@@ -2,18 +2,25 @@ import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useClanData } from '@/context/ClanDataContext'
 import { PlayerDetailCard } from '@/components/PlayerDetailCard'
-import { MOCK_PLAYER_DETAIL } from '@/mocks/playerDetail'
 import { ROLE_LABEL, ROLE_ICON } from '@/utils/roles'
+import type { PlayerDetail } from '@/types/clan'
 import styles from './PlayerProfile.module.css'
 
-// Placeholder para probar el flujo de navegación (tag → perfil) y el diseño
-// del layout. El cron de member_details (ver clean-player.json) todavía no
-// existe -- por eso solo el tag de prueba en MOCK_PLAYER_DETAIL tiene data
-// real; el resto de jugadores activos cae en el texto de "pendiente".
 export function PlayerProfile() {
   const { tag } = useParams<{ tag: string }>()
   const { members } = useClanData()
   const member = members.find(m => m.tag === tag)
+
+  const detailQuery = useQuery({
+    queryKey: ['player-detail', member?.tag],
+    enabled: !!member,
+    queryFn: async () => {
+      const res = await fetch(`/api/player-detail?tag=${encodeURIComponent(member!.tag)}`)
+      if (res.status === 404) return null
+      if (!res.ok) throw new Error('player-detail request failed')
+      return res.json() as Promise<PlayerDetail>
+    },
+  })
 
   const phraseQuery = useQuery({
     queryKey: ['player-phrase', member?.tag],
@@ -35,7 +42,19 @@ export function PlayerProfile() {
     )
   }
 
-  if (member.tag !== MOCK_PLAYER_DETAIL.tag) {
+  if (detailQuery.isLoading) {
+    return (
+      <main className={styles.container}>
+        <h1 className={styles.name}>{member.name}</h1>
+        <p className={styles.role}>{ROLE_LABEL[member.role]} {ROLE_ICON[member.role]}</p>
+        <p className={styles.favCard}>Cargando…</p>
+      </main>
+    )
+  }
+
+  const player = detailQuery.data
+
+  if (!player) {
     return (
       <main className={styles.container}>
         <h1 className={styles.name}>{member.name}</h1>
@@ -45,7 +64,6 @@ export function PlayerProfile() {
     )
   }
 
-  const player = MOCK_PLAYER_DETAIL
   const fav = player.currentFavouriteCard
 
   return (
@@ -58,13 +76,25 @@ export function PlayerProfile() {
       <div className={styles.body}>
         <div className={styles.left}>
           <PlayerDetailCard>
-            <img src={fav.iconUrls.medium} alt={fav.name} className={styles.favImage} />
-            <p className={styles.favLabel}>Carta favorita</p>
+            {fav ? (
+              <>
+                <img src={fav.iconUrls.medium} alt={fav.name} className={styles.favImage} />
+                <p className={styles.favLabel}>Carta favorita</p>
+              </>
+            ) : (
+              <p className={styles.favLabel}>Sin carta favorita</p>
+            )}
           </PlayerDetailCard>
         </div>
 
         <div className={styles.right}>
-          {phraseQuery.data && <p className={styles.phrase}>“{phraseQuery.data}”</p>}
+          {phraseQuery.data ? (
+            <p className={styles.phrase}>“{phraseQuery.data}”</p>
+          ) : (
+            <p className={styles.phrasePlaceholder}>
+              Este jugador aún no tiene un mensaje — se puede configurar desde el panel de administración.
+            </p>
+          )}
           <hr className={styles.divider} />
           <dl className={styles.stats}>
             <div className={styles.stat}>
