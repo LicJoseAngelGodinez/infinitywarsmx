@@ -3,7 +3,10 @@
 -- Requiere que pg_cron y pg_net ya estén habilitados (ver cron_war_live.sql).
 --
 -- ANTES DE CORRER: reemplaza el placeholder de abajo:
---   <SERVICE_ROLE_KEY>    → Settings → API → secret key (la nueva, no la legacy)
+--   <SERVICE_ROLE_KEY>    → Settings → API → service_role key (legacy, NO la
+--   secret key nueva -- ver gotcha en CLAUDE.md, probado 2026-07-26: la
+--   secret key nueva da 401 al invocar Edge Functions, solo el JWT legacy
+--   funciona para eso).
 
 select cron.schedule(
   'members-daily',           -- nombre del job (único)
