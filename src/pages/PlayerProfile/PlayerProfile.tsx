@@ -92,7 +92,7 @@ export function PlayerProfile() {
             <p className={styles.phrase}>“{phraseQuery.data}”</p>
           ) : (
             <p className={styles.phrasePlaceholder}>
-              Este jugador aún no tiene un mensaje — se puede configurar desde el panel de administración.
+              ¿Quieres colocar tu marca de guerrero? Únete a la comunidad y envía el mensaje que deseas se muestre en tu perfil.
             </p>
           )}
           <hr className={styles.divider} />
