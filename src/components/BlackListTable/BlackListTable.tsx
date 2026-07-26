@@ -1,4 +1,5 @@
 import { useClanData } from '@/context/ClanDataContext'
+import { PlayerLink } from '@/components/PlayerLink'
 import { ROLE_LABEL, ROLE_ICON } from '@/utils/roles'
 import styles from './BlackListTable.module.css'
 
@@ -34,7 +35,7 @@ export function BlackListTable() {
                 {m.role === 'elder' && <span className={`${styles.dot} ${styles.dotYellow}`} />}
                 {m.role === 'coLeader' && <span className={`${styles.dot} ${styles.dotRed}`} />}
               </td>
-              <td className={styles.name}>{m.clanRank}. {m.name}</td>
+              <td className={styles.name}>{m.clanRank}. <PlayerLink tag={m.tag} name={m.name} /></td>
               <td>{ROLE_LABEL[m.role]} {ROLE_ICON[m.role]}</td>
               <td>{m.trophies.toLocaleString()}</td>
               <td>

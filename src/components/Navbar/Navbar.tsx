@@ -7,7 +7,6 @@ import styles from './Navbar.module.css'
 import logo from '@/assets/logo.jpeg'
 
 const NAV_ITEMS = [
-  { label: 'Clan',     to: '/'         },
   { label: 'Guerra',   to: '/guerra'   },
   { label: 'Reglas',   to: '/reglas'   },
   { label: 'Rankings', to: '/rankings' },

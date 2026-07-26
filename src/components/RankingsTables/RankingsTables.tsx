@@ -1,4 +1,5 @@
 import { useClanData } from '@/context/ClanDataContext'
+import { PlayerLink } from '@/components/PlayerLink'
 import { ROLE_ICON } from '@/utils/roles'
 import {
   getDonationsPct,
@@ -26,7 +27,9 @@ function Table({ title, entries, emptyLabel }: TableProps) {
         <ol className={styles.list}>
           {entries.map((entry, i) => (
             <li key={entry.tag} className={styles.item}>
-              <span className={styles.rank}>{i + 1}. {entry.name} {ROLE_ICON[entry.role]}</span>
+              <span className={styles.rank}>
+                {i + 1}. <PlayerLink tag={entry.tag} name={entry.name} /> {ROLE_ICON[entry.role]}
+              </span>
               <span className={styles.value}>{entry.value.toLocaleString()}</span>
             </li>
           ))}

@@ -1,0 +1,1 @@
+export { PlayerDetailCard } from './PlayerDetailCard'

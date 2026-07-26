@@ -1,4 +1,5 @@
 import { useClanData } from '@/context/ClanDataContext'
+import { PlayerLink } from '@/components/PlayerLink'
 import { getTopDonators, getTopWarParticipants, getVeteranCandidates } from '@/utils/mvp'
 import styles from './MvpCards.module.css'
 import donationsImg from '@/assets/donations.webp'
@@ -29,7 +30,7 @@ export function MvpCards() {
           <img src={donationsImg} alt="Donaciones" className={styles.cardImage} />
         </div>
         <div>
-          <p className={styles.name}>{topDonator.name}</p>
+          <p className={styles.name}><PlayerLink tag={topDonator.tag} name={topDonator.name} /></p>
           <p className={styles.rank}>Posición #{topDonator.clanRank}</p>
           <p className={styles.score}>{topDonator.value.toLocaleString()} donaciones</p>
         </div>
@@ -45,7 +46,7 @@ export function MvpCards() {
             <img src={participationImg} alt="Participación en guerra" className={styles.cardImage} />
           </div>
           <div>
-            <p className={styles.name}>{topParticipant.name}</p>
+            <p className={styles.name}><PlayerLink tag={topParticipant.tag} name={topParticipant.name} /></p>
             <p className={styles.rank}>Posición #{topParticipant.clanRank}</p>
             <p className={styles.score}>{topParticipant.value.toLocaleString()} fama</p>
 
@@ -63,7 +64,7 @@ export function MvpCards() {
             <img src={eldersImg} alt="Candidato a veteranía" className={styles.cardImage} />
           </div>
           <div>
-            <p className={styles.name}>{topCandidate.name}</p>
+            <p className={styles.name}><PlayerLink tag={topCandidate.tag} name={topCandidate.name} /></p>
             <p className={styles.rank}>Posición #{topCandidate.clanRank}</p>
             <p className={styles.score}>Candidato</p>
 

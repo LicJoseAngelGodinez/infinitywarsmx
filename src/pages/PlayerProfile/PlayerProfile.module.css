@@ -1,0 +1,121 @@
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.name {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #fffffe;
+}
+
+.role {
+  margin: 0 0 2rem;
+  font-size: 0.95rem;
+  color: #999;
+}
+
+.favCard {
+  font-size: 0.95rem;
+  color: #999;
+}
+
+.notFound {
+  font-size: 0.95rem;
+  color: #999;
+}
+
+.body {
+  display: flex;
+  align-items: stretch;
+  gap: 2rem;
+  text-align: left;
+}
+
+.left {
+  flex-shrink: 0;
+  width: 16rem;
+}
+
+.favImage {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  object-fit: contain;
+}
+
+.favLabel {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #999;
+}
+
+.right {
+  flex: 1;
+  min-width: 0;
+}
+
+.phrase {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: #fffffe;
+}
+
+.divider {
+  margin: 1rem 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1.5rem;
+}
+
+.stat dt {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #999;
+}
+
+.stat dd {
+  margin: 0.15rem 0 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fffffe;
+}
+
+.deckGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.deckCard {
+  height: 5rem;
+  border-radius: 6px;
+}
+
+@media (max-width: 700px) {
+  .body {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .left {
+    width: 100%;
+    max-width: 14rem;
+    height: 14rem;
+  }
+
+  .stats {
+    text-align: left;
+  }
+}

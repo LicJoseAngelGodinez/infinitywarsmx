@@ -1,4 +1,8 @@
+import { useEffect, useState } from 'react'
 import { useClanData } from '@/context/ClanDataContext'
+import { useAuth } from '@/context/AuthContext'
+import { useRejoinCounts } from '@/hooks/useRejoinCounts'
+import { PlayerLink } from '@/components/PlayerLink'
 import { ROLE_LABEL, ROLE_ICON } from '@/utils/roles'
 import { MIN_DONATIONS } from '@/utils/mvp'
 import styles from './MemberRosterTable.module.css'
@@ -7,6 +11,20 @@ const INACTIVE_THRESHOLD_MS = 60 * 24 * 60 * 60 * 1000 // ~2 meses sin conectars
 
 export function MemberRosterTable() {
   const { members, warLive } = useClanData()
+  const { session } = useAuth()
+  const rejoinCounts = useRejoinCounts()
+  const [openTag, setOpenTag] = useState<string | null>(null)
+
+  // Tap/click fuera del ícono cierra el tooltip -- sin esto, en touch
+  // se quedaría abierto hasta tocar el mismo ícono otra vez.
+  useEffect(() => {
+    if (!openTag) return
+    function handleOutside(e: MouseEvent) {
+      if (!(e.target as HTMLElement).closest(`[data-rejoin-badge]`)) setOpenTag(null)
+    }
+    document.addEventListener('click', handleOutside)
+    return () => document.removeEventListener('click', handleOutside)
+  }, [openTag])
 
   if (!members.length) return null
 
@@ -33,6 +51,7 @@ export function MemberRosterTable() {
             const lastSeenMs = m.lastSeen ? new Date(m.lastSeen).getTime() : 0
             const inactive   = now - lastSeenMs > INACTIVE_THRESHOLD_MS
             const lowDons    = !isTraining && m.donations < MIN_DONATIONS
+            const rejoinCount = rejoinCounts.get(m.tag) ?? 0
 
             return (
               <tr key={m.tag}>
@@ -43,7 +62,25 @@ export function MemberRosterTable() {
                       ? <span className={`${styles.dot} ${styles.dotYellow}`} />
                       : null}
                 </td>
-                <td className={styles.name}>{m.clanRank}. {m.name}</td>
+                <td className={styles.name}>
+                  {m.clanRank}. <PlayerLink tag={m.tag} name={m.name} />
+                  {session && rejoinCount > 1 && (
+                    <span className={styles.rejoinWrapper} data-rejoin-badge>
+                      <button
+                        type="button"
+                        className={styles.rejoinIcon}
+                        onClick={() => setOpenTag(openTag === m.tag ? null : m.tag)}
+                      >
+                        🔁
+                      </button>
+                      {openTag === m.tag && (
+                        <span className={styles.rejoinTooltip}>
+                          Ha estado en el clan {rejoinCount} veces
+                        </span>
+                      )}
+                    </span>
+                  )}
+                </td>
                 <td>{ROLE_LABEL[m.role]} {ROLE_ICON[m.role]}</td>
                 <td>{m.trophies.toLocaleString()} / {m.arena?.name ?? '—'}</td>
                 <td>

@@ -86,6 +86,15 @@ export function MemberNoteModal({ user, onClose, onSaved }: MemberNoteModalProps
               className={styles.input}
             />
           </label>
+
+          <button
+            type="button"
+            className={styles.clearPtoBtn}
+            aria-label="Limpiar PTO"
+            onClick={() => { setPtoStart(''); setPtoEnd('') }}
+          >
+            🗑️
+          </button>
         </div>
 
         <label className={styles.label}>

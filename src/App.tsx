@@ -11,7 +11,9 @@ import { Reglas } from '@/pages/Reglas'
 import { Registro } from '@/pages/Registro'
 import { Rankings } from '@/pages/Rankings'
 import { AdminDashboard } from '@/pages/AdminDashboard'
+import { PlayerProfile } from '@/pages/PlayerProfile'
 import { NotFound } from '@/pages/NotFound'
+import styles from './App.module.css'
 
 function AppContent() {
   const { isLoading } = useClanData()
@@ -20,15 +22,18 @@ function AppContent() {
       <ScrollToTop />
       <LoadingOverlay isLoaded={!isLoading} />
       <Navbar />
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/guerra" element={<Guerra />} />
-        <Route path="/reglas" element={<Reglas />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route path="/rankings" element={<Rankings />} />
-        <Route path="/dashboard" element={<AdminDashboard />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <div className={styles.pageWrapper}>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/guerra" element={<Guerra />} />
+          <Route path="/reglas" element={<Reglas />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/rankings" element={<Rankings />} />
+          <Route path="/jugador/:tag" element={<PlayerProfile />} />
+          <Route path="/dashboard" element={<AdminDashboard />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </div>
       <Footer />
     </>
   )

@@ -102,3 +102,49 @@
   opacity: 0.5;
   cursor: default;
 }
+
+.searchInput {
+  margin: 0.75rem 1rem 0.5rem;
+  padding: 0.5rem 0.75rem;
+  width: calc(100% - 2rem);
+  max-width: 280px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  color: #fffffe;
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.emptyRow {
+  color: #999;
+  font-style: italic;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  font-size: 1rem;
+}
+
+.actionsCell {
+  width: 1%;
+  text-align: right;
+}
+
+.actionsCell > * {
+  display: inline-flex;
+}
+
+.actionsCell > * + * {
+  margin-left: 0.5rem;
+}

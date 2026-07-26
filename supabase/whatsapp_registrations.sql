@@ -64,8 +64,30 @@ CREATE POLICY "whatsapp_registrations_update_public"
 
 -- ─────────────────────────────────────────────────────────────
 -- Grants
+--   ⚠️ service_role (key secreta) NO se agrega aquí a propósito de
+--   recordatorio: el `GRANT ALL ON ALL TABLES ... TO service_role`
+--   de grants.sql solo aplicó a las tablas que existían en ese
+--   momento -- cualquier tabla nueva creada después (como esta)
+--   necesita su propio `GRANT ... TO service_role` explícito, o las
+--   Vercel functions que usan la key secreta truenan con
+--   "permission denied" (pasó en producción el 2026-07-18 con
+--   api/whatsapp-tags.js). Agregado abajo.
+--
+--   ⚠️ `authenticated` también necesita su propio GRANT, aparte de
+--   `anon`. El formulario de WhatsApp es público (visitantes sin
+--   sesión pegan como `anon`), pero si alguien lo llena estando
+--   logueado (ej. el admin probando el flujo desde el mismo
+--   navegador), el cliente de Supabase manda el JWT y Postgres
+--   evalúa esa petición como rol `authenticated`, no `anon` -- y sin
+--   este GRANT trona "permission denied for table
+--   whatsapp_registrations" (code 42501), aunque la política de RLS
+--   de INSERT sea pública (`WITH CHECK (true)`). Mismo patrón de
+--   siempre: RLS controla FILAS, GRANT controla TABLA, y son
+--   independientes por rol. Pasó en producción el 2026-07-26.
 -- ─────────────────────────────────────────────────────────────
 GRANT INSERT, UPDATE ON whatsapp_registrations TO anon;
+GRANT INSERT, UPDATE ON whatsapp_registrations TO authenticated;
+GRANT ALL ON whatsapp_registrations TO service_role;
 
 
 -- ─────────────────────────────────────────────────────────────

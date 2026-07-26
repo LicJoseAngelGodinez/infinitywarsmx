@@ -1,4 +1,5 @@
 import { useClanData } from '@/context/ClanDataContext'
+import { PlayerLink } from '@/components/PlayerLink'
 import { ROLE_LABEL, ROLE_ICON } from '@/utils/roles'
 import styles from './WarRosterTable.module.css'
 
@@ -31,7 +32,7 @@ export function WarRosterTable() {
                 <td className={styles.dotCol}>
                   {inactive && <span className={styles.dot} />}
                 </td>
-                <td className={styles.name}>{m.clanRank}. {m.name}</td>
+                <td className={styles.name}>{m.clanRank}. <PlayerLink tag={m.tag} name={m.name} /></td>
                 <td>{ROLE_LABEL[m.role]} {ROLE_ICON[m.role]}</td>
                 <td>{m.fame}</td>
                 <td>{m.decksUsed}</td>
